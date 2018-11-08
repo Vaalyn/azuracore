@@ -80,7 +80,7 @@ class ErrorHandler
         $return_json = ($req->isXhr() || $this->return_json);
 
         if ($e instanceof \Azura\Exception\NotLoggedIn) {
-            $error_message = __('You must be logged in to access this page.');
+            $error_message = 'You must be logged in to access this page.';
 
             if ($return_json) {
                 return $res
@@ -89,7 +89,7 @@ class ErrorHandler
             }
 
             // Redirect to login page for not-logged-in users.
-            $this->session->flash(__('You must be logged in to access this page.'), 'red');
+            $this->session->flash('You must be logged in to access this page.', 'red');
 
             // Set referrer for login redirection.
             $referrer_login = $this->session->get('login_referrer');
@@ -101,7 +101,7 @@ class ErrorHandler
         }
 
         if ($e instanceof \Azura\Exception\PermissionDenied) {
-            $error_message = __('You do not have permission to access this portion of the site.');
+            $error_message = 'You do not have permission to access this portion of the site.';
 
             if ($return_json) {
                 return $res
@@ -110,7 +110,7 @@ class ErrorHandler
             }
 
             // Bounce back to homepage for permission-denied users.
-            $this->session->flash(__('You do not have permission to access this portion of the site.'),
+            $this->session->flash('You do not have permission to access this portion of the site.',
                 Session\Flash::ERROR);
 
             return $res
