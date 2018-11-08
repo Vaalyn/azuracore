@@ -3,7 +3,7 @@ namespace Azura\Console;
 
 use Azura\Event\BuildConsoleCommands;
 use Azura\EventDispatcher;
-use Slim\Container;
+use Azura\Container;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 

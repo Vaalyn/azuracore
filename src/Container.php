@@ -83,6 +83,13 @@ class Container extends PimpleContainer implements ContainerInterface
 
         $defaultProvider = new DefaultServicesProvider();
         $defaultProvider->register($this);
+
+        // Check for services.php file and include it if one exists.
+        $config_dir = $this['settings']['config_dir'];
+
+        if (file_exists($config_dir.'/services.php')) {
+            call_user_func(include($config_dir.'/services.php'), $this);
+        }
     }
 
     public function addAlias($source_name, $dest_name): void

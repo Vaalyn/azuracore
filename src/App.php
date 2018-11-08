@@ -86,6 +86,12 @@ class App extends \Slim\App
         session_cache_limiter('');
 
         $di = new Container($values);
+        $app = new self($di);
+
+        /** @var EventDispatcher $dispatcher */
+        $dispatcher = $di[EventDispatcher::class];
+        $dispatcher->dispatch(Event\BuildRoutes::NAME, new Event\BuildRoutes($app));
+
         return new self($di);
     }
 }
