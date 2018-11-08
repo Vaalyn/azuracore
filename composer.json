@@ -1,0 +1,40 @@
+{
+    "name": "AzuraCast/azuracore",
+    "description": "A lightweight core application framework.",
+    "license": "Apache-2.0",
+    "require": {
+        "php": ">=7.2",
+        "ext-intl": "*",
+        "ext-json": "*",
+        "ext-redis": "*",
+        "filp/whoops": "2.*",
+        "gettext/gettext": "^4.4",
+        "guzzlehttp/guzzle": ">6.0",
+        "league/plates": "^3.1",
+        "monolog/monolog": "^1.23",
+        "paragonie/certainty": "^2",
+        "slim/slim": "^3.0",
+        "symfony/console": "^4.1",
+        "symfony/event-dispatcher": "^4.1",
+        "zendframework/zend-config": "^3.1.0"
+    },
+    "require-dev": {
+        "roave/security-advisories": "dev-master"
+    },
+    "authors": [
+        {
+            "name": "Buster Neece",
+            "email": "buster@busterneece.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Azura\\": "src"
+        }
+    },
+    "config": {
+        "preferred-install": "dist"
+    },
+    "prefer-stable": true,
+    "minimum-stability": "dev"
+}
