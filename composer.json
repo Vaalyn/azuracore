@@ -1,5 +1,5 @@
 {
-    "name": "AzuraCast/azuracore",
+    "name": "azuracast/azuracore",
     "description": "A lightweight core application framework.",
     "license": "Apache-2.0",
     "require": {
