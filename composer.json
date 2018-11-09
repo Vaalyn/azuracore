@@ -6,6 +6,7 @@
         "php": ">=7.2",
         "ext-json": "*",
         "ext-redis": "*",
+
         "filp/whoops": "2.*",
         "guzzlehttp/guzzle": ">6.0",
         "league/plates": "^3.1",
@@ -14,6 +15,7 @@
         "slim/slim": "^3.0",
         "symfony/console": "^4.1",
         "symfony/event-dispatcher": "^4.1",
+        "symfony/var-dumper": "^4.1",
         "zendframework/zend-config": "^3.1.0"
     },
     "require-dev": {
