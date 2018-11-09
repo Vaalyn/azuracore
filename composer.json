@@ -4,7 +4,6 @@
     "license": "Apache-2.0",
     "require": {
         "php": ">=7.2",
-        "ext-intl": "*",
         "ext-json": "*",
         "ext-redis": "*",
         "filp/whoops": "2.*",

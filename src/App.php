@@ -15,9 +15,8 @@ class App extends \Slim\App
      *      'settings' => [
      *          'base_dir' => '/path', // REQUIRED!
      *          'temp_dir' => '/path', // Optional
-     *          'views_dir' => '/path', // Optional
-     *          'translations_dir' => '/path', // Optional
-     *          'config_dir' => '/path', // Optional
+     *          'views_dir' => '/path', // Optional, defaults to $base_dir/templates
+     *          'config_dir' => '/path', // Optional, defaults to $base_dir/config
      *          'is_docker' => false, // Default TRUE
      *          ... any other Slim or Azura specific settings.
      *      ],
@@ -43,9 +42,6 @@ class App extends \Slim\App
         $settings['views_dir'] = $settings['views_dir'] ??
             $settings['base_dir'].'/templates';
 
-        $settings['translations_dir'] = $settings['translations_dir'] ??
-            $settings['base_dir'].'/translations';
-
         $settings['is_docker'] = $settings['is_docker'] ?? true;
 
         if ($settings['is_docker']) {
@@ -55,7 +51,7 @@ class App extends \Slim\App
         }
 
         $settings['is_cli'] = ('cli' === PHP_SAPI);
-        $settings['environment'] = $_ENV['APPLICATION_ENV'] ?? self::ENV_PRODUCTION;
+        $settings['environment'] = $_ENV['APPLICATION_ENV'] ?? $_ENV['APP_ENV'] ?? self::ENV_PRODUCTION;
         $settings['is_production'] = (self::ENV_PRODUCTION === $settings['environment']);
 
         if ($settings['is_production']) {
@@ -64,8 +60,8 @@ class App extends \Slim\App
             $settings['displayErrorDetails'] = true;
         }
 
-        if (file_exists($settings['base_dir'].'/config/settings.php')) {
-            $app_settings = require($settings['base_dir'].'/config/settings.php');
+        if (file_exists($settings['config_dir'].'/settings.php')) {
+            $app_settings = require($settings['config_dir'].'/settings.php');
             $settings = array_merge($settings, $app_settings);
         }
 
