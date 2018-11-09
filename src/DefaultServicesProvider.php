@@ -256,9 +256,7 @@ class DefaultServicesProvider
                     }
 
                     $config->addCustomNumericFunction('RAND', Doctrine\Functions\Rand::class);
-                    $config->addCustomStringFunction('FIELD', \DoctrineExtensions\Query\Mysql\Field::class);
-                    $config->addCustomStringFunction('IF', \DoctrineExtensions\Query\Mysql\IfElse::class);
-
+                    
                     $em = EntityManager::create($options['conn'], $config, new \Doctrine\Common\EventManager);
 
                     return $em;
