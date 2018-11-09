@@ -186,7 +186,6 @@ class DefaultServicesProvider
                     'proxyNamespace' => 'AppProxy',
                     'proxyPath' => $settings[Settings::TEMP_DIR] . '/proxies',
                     'modelPath' => $settings[Settings::BASE_DIR] . '/src/Entity',
-                    'useSecondLevelCache' => (Settings::ENV_TESTING !== $settings[Settings::APP_ENV]),
                     'conn' => [
                         'host'      => $_ENV['MYSQL_HOST'] ?? 'mariadb',
                         'port'      => $_ENV['MYSQL_PORT'] ?? 3306,
@@ -242,9 +241,6 @@ class DefaultServicesProvider
                     $config->setMetadataCacheImpl($options['cache']);
                     $config->setQueryCacheImpl($options['cache']);
                     $config->setResultCacheImpl($options['cache']);
-
-                    // Disable second-level cache for unit testing purposes, as it causes data to be out of date on pages.
-                    $config->setSecondLevelCacheEnabled($options['useSecondLevelCache']);
 
                     $config->setProxyDir($options['proxyPath']);
                     $config->setProxyNamespace($options['proxyNamespace']);
