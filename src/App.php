@@ -47,8 +47,8 @@ class App extends \Slim\App
             $_ENV = array_merge($_ENV, parse_ini_file($settings[Settings::BASE_DIR].'/env.ini'));
         }
 
-        $settings[Settings::ENVIRONMENT] = $_ENV['APPLICATION_ENV'] ?? Settings::ENV_PRODUCTION;
-        $settings[Settings::IS_PRODUCTION] = (Settings::ENV_PRODUCTION === $settings[Settings::ENVIRONMENT]);
+        $settings[Settings::APP_ENV] = $_ENV['APPLICATION_ENV'] ?? Settings::ENV_PRODUCTION;
+        $settings[Settings::IS_PRODUCTION] = (Settings::ENV_PRODUCTION === $settings[Settings::APP_ENV]);
 
         if ($settings[Settings::IS_PRODUCTION]) {
             $settings[Settings::SLIM_ROUTER_CACHE_FILE] = $settings[Settings::TEMP_DIR].'/app_routes.cache.php';
