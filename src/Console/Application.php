@@ -3,27 +3,27 @@ namespace Azura\Console;
 
 use Azura\Event\BuildConsoleCommands;
 use Azura\EventDispatcher;
-use Azura\Container;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class Application extends \Symfony\Component\Console\Application
 {
-    /** @var Container */
+    /** @var ContainerInterface */
     protected $di;
 
     /**
-     * @param Container $di
+     * @param ContainerInterface $di
      */
-    public function setContainer(Container $di)
+    public function setContainer(ContainerInterface $di)
     {
         $this->di = $di;
     }
 
     /**
-     * @return Container
+     * @return ContainerInterface
      */
-    public function getContainer(): Container
+    public function getContainer(): ContainerInterface
     {
         return $this->di;
     }
@@ -32,7 +32,6 @@ class Application extends \Symfony\Component\Console\Application
      * @param $service_name
      * @return mixed
      * @throws \Azura\Exception
-     * @throws \Interop\Container\Exception\ContainerException
      */
     public function getService($service_name)
     {
