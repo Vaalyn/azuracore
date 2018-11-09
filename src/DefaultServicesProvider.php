@@ -25,6 +25,8 @@ class DefaultServicesProvider
      */
     public function register(Container $container)
     {
+        $container->addAlias(Settings::class, 'settings');
+
         if (!isset($container['environment'])) {
             $container['environment'] = function () {
                 return new Environment($_SERVER);
@@ -48,7 +50,7 @@ class DefaultServicesProvider
                 $headers = new Headers(['Content-Type' => 'text/html; charset=UTF-8']);
                 $response = new Http\Response(200, $headers, null);
 
-                return $response->withProtocolVersion($container->get('settings')['httpVersion']);
+                return $response->withProtocolVersion($container->get('settings')[Settings::SLIM_HTTP_VERSION]);
             };
 
             $container->addAlias(Http\Response::class, 'response');
@@ -57,7 +59,7 @@ class DefaultServicesProvider
 
         if (!isset($container['router'])) {
             $container['router'] = function (Container $container) {
-                $routerCacheFile = $container->get('settings')['routerCacheFile'];
+                $routerCacheFile = $container->get('settings')[Settings::SLIM_ROUTER_CACHE_FILE];
                 $router = new Http\Router();
                 $router->setCacheFile($routerCacheFile);
                 $router->setContainer($container);
@@ -112,7 +114,7 @@ class DefaultServicesProvider
                         $settings = $di['settings'];
 
                         if ($request->getUri()->getScheme() === 'https') {
-                            $fetcher = new \ParagonIE\Certainty\RemoteFetch($settings['temp_dir']);
+                            $fetcher = new \ParagonIE\Certainty\RemoteFetch($settings[Settings::TEMP_DIR]);
                             $latestCACertBundle = $fetcher->getLatestBundle();
 
                             $options['verify'] = $latestCACertBundle->getFilePath();
@@ -149,7 +151,7 @@ class DefaultServicesProvider
         if (!isset($container[Config::class])) {
             $container[Config::class] = function (Container $di) {
                 $settings = $di['settings'];
-                return new Config($settings['config_dir']);
+                return new Config($settings[Settings::CONFIG_DIR]);
             };
         }
 
@@ -162,8 +164,8 @@ class DefaultServicesProvider
                     $di['router'],
                     $di[Session::class],
                     $di[View::class],
-                    (!$settings['is_production']),
-                    ($settings['is_cli'] || $settings['environment'] === App::ENV_TESTING)
+                    (!$settings[Settings::IS_PRODUCTION]),
+                    ($settings[Settings::IS_CLI] || $settings[Settings::APP_ENV] === Settings::ENV_TESTING)
                 );
             };
         }
@@ -175,8 +177,8 @@ class DefaultServicesProvider
                 // Register application default events.
                 $settings = $di->get('settings');
 
-                if (file_exists($settings['config_dir'].'/events.php')) {
-                    call_user_func($settings['config_dir'].'/events.php', $dispatcher);
+                if (file_exists($settings[Settings::CONFIG_DIR].'/events.php')) {
+                    call_user_func($settings[Settings::CONFIG_DIR].'/events.php', $dispatcher);
                 }
 
                 return $dispatcher;
@@ -187,15 +189,15 @@ class DefaultServicesProvider
             $container[Logger::class] = function (Container $di) {
                 $settings = $di['settings'];
 
-                $logger = new Monolog\Logger($settings['name'] ?? 'app');
-                $logging_level = $settings['is_production'] ? Logger::INFO : Logger::DEBUG;
+                $logger = new Logger($settings[Settings::APP_NAME] ?? 'app');
+                $logging_level = $settings[Settings::IS_PRODUCTION] ? Logger::INFO : Logger::DEBUG;
 
                 if ($settings['is_docker'] || $settings['is_cli']) {
                     $log_stderr = new \Monolog\Handler\StreamHandler('php://stderr', $logging_level, true);
                     $logger->pushHandler($log_stderr);
                 }
 
-                $log_file = new \Monolog\Handler\StreamHandler($settings['temp_dir'] . '/azuracast.log', $logging_level, true);
+                $log_file = new \Monolog\Handler\StreamHandler($settings[Settings::TEMP_DIR] . '/azuracast.log', $logging_level, true);
                 $logger->pushHandler($log_file);
 
                 return $logger;
@@ -257,7 +259,7 @@ class DefaultServicesProvider
             $container[\Redis::class] = $container->factory(function (Container $di) {
                 $settings = $di->get('settings');
 
-                $redis_host = $settings['is_docker'] ? 'redis' : 'localhost';
+                $redis_host = $settings[Settings::IS_DOCKER] ? 'redis' : 'localhost';
 
                 $redis = new \Redis();
                 $redis->connect($redis_host, 6379, 15);
@@ -269,12 +271,12 @@ class DefaultServicesProvider
             $container[Session::class] = function (Container $di) {
                 $settings = $di['settings'];
 
-                if (App::ENV_TESTING !== $settings['environment']) {
+                if (Settings::ENV_TESTING !== $settings[Settings::APP_ENV]) {
                     ini_set('session.gc_maxlifetime', 86400);
                     ini_set('session.gc_probability', 1);
                     ini_set('session.gc_divisor', 100);
 
-                    $redis_server = ($settings['is_docker']) ? 'redis' : 'localhost';
+                    $redis_server = ($settings[Settings::IS_DOCKER]) ? 'redis' : 'localhost';
                     ini_set('session.save_handler', 'redis');
                     ini_set('session.save_path', 'tcp://' . $redis_server . ':6379?database=1');
                 }
@@ -287,7 +289,7 @@ class DefaultServicesProvider
             $container[View::class] = $container->factory(function (Container $di) {
                 $settings = $di['settings'];
 
-                $view = new View($settings['views_dir'], 'phtml');
+                $view = new View($settings[Settings::VIEWS_DIR], 'phtml');
 
                 $view->registerFunction('service', function ($service) use ($di) {
                     return $di->get($service);

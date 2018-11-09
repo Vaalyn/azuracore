@@ -3,10 +3,6 @@ namespace Azura;
 
 class App extends \Slim\App
 {
-    const ENV_DEVELOPMENT   = 'development';
-    const ENV_TESTING       = 'testing';
-    const ENV_PRODUCTION    = 'production';
-
     /**
      * Initialize an application and DI container with the specified settings.
      *
@@ -14,7 +10,7 @@ class App extends \Slim\App
      * [
      *      'settings' => [
      *          'base_dir' => '/path', // REQUIRED!
-     *          'temp_dir' => '/path', // Optional
+     *          'temp_dir' => '/path', // Optional, defaults to $base_dir/../www_tmp
      *          'views_dir' => '/path', // Optional, defaults to $base_dir/templates
      *          'config_dir' => '/path', // Optional, defaults to $base_dir/config
      *          'is_docker' => false, // Default TRUE
@@ -29,49 +25,53 @@ class App extends \Slim\App
     {
         $settings = $values['settings'] ?? [];
 
-        if (!isset($settings['base_dir'])) {
+        if (!isset($settings[Settings::BASE_DIR])) {
             throw new Exception\Bootstrap('No base directory specified!');
         }
 
-        $settings['temp_dir'] = $settings['temp_dir'] ??
-            dirname($settings['base_dir']).'/www_tmp';
+        if (!isset($settings[Settings::TEMP_DIR])) {
+            $settings[Settings::TEMP_DIR] = dirname($settings[Settings::BASE_DIR]).'/www_tmp';
+        }
 
-        $settings['config_dir'] = $settings['config_dir'] ??
-            $settings['base_dir'].'/config';
+        if (!isset($settings[Settings::CONFIG_DIR])) {
+            $settings[Settings::CONFIG_DIR] = $settings[Settings::BASE_DIR].'/config';
+        }
 
-        $settings['views_dir'] = $settings['views_dir'] ??
-            $settings['base_dir'].'/templates';
+        if (!isset($settings[Settings::VIEWS_DIR])) {
+            $settings[Settings::VIEWS_DIR] = $settings[Settings::BASE_DIR].'/templates';
+        }
 
-        $settings['is_docker'] = $settings['is_docker'] ?? true;
-
-        if ($settings['is_docker']) {
+        if ($settings[Settings::IS_DOCKER]) {
             $_ENV = getenv();
-        } else if (file_exists($settings['base_dir'].'/env.ini')) {
-            $_ENV = array_merge($_ENV, parse_ini_file($settings['base_dir'].'/env.ini'));
+        } else if (file_exists($settings[Settings::BASE_DIR].'/env.ini')) {
+            $_ENV = array_merge($_ENV, parse_ini_file($settings[Settings::BASE_DIR].'/env.ini'));
         }
 
-        $settings['is_cli'] = ('cli' === PHP_SAPI);
-        $settings['environment'] = $_ENV['APPLICATION_ENV'] ?? $_ENV['APP_ENV'] ?? self::ENV_PRODUCTION;
-        $settings['is_production'] = (self::ENV_PRODUCTION === $settings['environment']);
+        $settings[Settings::ENVIRONMENT] = $_ENV['APPLICATION_ENV'] ?? Settings::ENV_PRODUCTION;
+        $settings[Settings::IS_PRODUCTION] = (Settings::ENV_PRODUCTION === $settings[Settings::ENVIRONMENT]);
 
-        if ($settings['is_production']) {
-            $settings['routerCacheFile'] = $settings['temp_dir'].'/app_routes.cache.php';
+        if ($settings[Settings::IS_PRODUCTION]) {
+            $settings[Settings::SLIM_ROUTER_CACHE_FILE] = $settings[Settings::TEMP_DIR].'/app_routes.cache.php';
         } else {
-            $settings['displayErrorDetails'] = true;
+            $settings[Settings::SLIM_DISPLAY_ERROR_DETAILS] = true;
         }
 
-        if (file_exists($settings['config_dir'].'/settings.php')) {
-            $app_settings = require($settings['config_dir'].'/settings.php');
+        if (file_exists($settings[Settings::CONFIG_DIR].'/settings.php')) {
+            $app_settings = require($settings[Settings::CONFIG_DIR].'/settings.php');
             $settings = array_merge($settings, $app_settings);
+        }
+
+        if (!($settings instanceof Settings)) {
+            $settings = new Settings($settings);
         }
 
         $values['settings'] = $settings;
 
         // Apply PHP settings.
-        ini_set('display_startup_errors',   !$settings['is_production'] ? 1 : 0);
-        ini_set('display_errors',           !$settings['is_production'] ? 1 : 0);
+        ini_set('display_startup_errors',   !$settings[Settings::IS_PRODUCTION] ? 1 : 0);
+        ini_set('display_errors',           !$settings[Settings::IS_PRODUCTION] ? 1 : 0);
         ini_set('log_errors',               1);
-        ini_set('error_log',                $settings['is_docker'] ? '/dev/stderr' : $settings['temp_dir'].'/php_errors.log');
+        ini_set('error_log',                $settings[Settings::IS_DOCKER] ? '/dev/stderr' : $settings[Settings::TEMP_DIR].'/php_errors.log');
         ini_set('error_reporting',          E_ALL & ~E_NOTICE & ~E_WARNING & ~E_STRICT);
         ini_set('session.use_only_cookies', 1);
         ini_set('session.cookie_httponly',  1);

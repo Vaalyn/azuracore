@@ -29,16 +29,6 @@ use Slim\Exception\ContainerException as SlimContainerException;
  */
 class Container extends PimpleContainer implements ContainerInterface
 {
-    protected $defaultSettings = [
-        'httpVersion' => '1.1',
-        'responseChunkSize' => 4096,
-        'outputBuffering' => false,
-        'determineRouteBeforeAppMiddleware' => true,
-        'displayErrorDetails' => false,
-        'addContentLengthHeader' => false,
-        'routerCacheFile' => false,
-    ];
-
     /**
      * @var array Mapping of service aliases
      */
@@ -47,39 +37,16 @@ class Container extends PimpleContainer implements ContainerInterface
     /**
      * Create new container
      *
-     * @param array $values The parameters or objects.
+     * @param array $values
+     * @throws Exception\Bootstrap
      */
     public function __construct(array $values = [])
     {
+        if (!isset($values['settings'])) {
+            throw new Exception\Bootstrap('No settings provided.');
+        }
+
         parent::__construct($values);
-
-        $userSettings = isset($values['settings']) ? $values['settings'] : [];
-        $this->registerDefaultServices($userSettings);
-    }
-
-    /**
-     * This function registers the default services that Slim needs to work.
-     *
-     * All services are shared - that is, they are registered such that the
-     * same instance is returned on subsequent calls.
-     *
-     * @param array $userSettings Associative array of application settings
-     *
-     * @return void
-     */
-    protected function registerDefaultServices($userSettings)
-    {
-        $defaultSettings = $this->defaultSettings;
-
-        /**
-         * This service MUST return an array or an
-         * instance of \ArrayAccess.
-         *
-         * @return array|\ArrayAccess
-         */
-        $this['settings'] = function () use ($userSettings, $defaultSettings) {
-            return new \Slim\Collection(array_merge($defaultSettings, $userSettings));
-        };
 
         $defaultProvider = new DefaultServicesProvider();
         $defaultProvider->register($this);
