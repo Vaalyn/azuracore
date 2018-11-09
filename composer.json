@@ -6,7 +6,12 @@
         "php": ">=7.2",
         "ext-json": "*",
         "ext-redis": "*",
+        "ext-PDO": "*",
 
+        "doctrine/data-fixtures": "^1.3",
+        "doctrine/dbal": "^2.8",
+        "doctrine/migrations": "^1.5",
+        "doctrine/orm": "~2.6",
         "filp/whoops": "2.*",
         "guzzlehttp/guzzle": ">6.0",
         "league/plates": "^3.1",

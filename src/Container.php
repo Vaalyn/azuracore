@@ -59,14 +59,14 @@ class Container extends PimpleContainer implements ContainerInterface
         }
     }
 
-    public function addAlias($source_name, $dest_name): void
+    public function addAlias($alias_name, $original_name): void
     {
-        $this->aliases[$source_name] = $dest_name;
+        $this->aliases[$alias_name] = $original_name;
     }
 
-    public function removeAlias($source_name): void
+    public function removeAlias($alias_name): void
     {
-        unset($this->aliases[$source_name]);
+        unset($this->aliases[$alias_name]);
     }
 
     /********************************************************************************

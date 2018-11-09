@@ -1,6 +1,8 @@
 <?php
 namespace Azura;
 
+use Doctrine\DBAL\Connection;
+use Doctrine\ORM\EntityManager;
 use GuzzleHttp\Client;
 use Monolog\Logger;
 use Psr\Http\Message\ResponseInterface;
@@ -153,6 +155,119 @@ class DefaultServicesProvider
                 $settings = $di['settings'];
                 return new Config($settings[Settings::CONFIG_DIR]);
             };
+        }
+
+        if (!isset($container[Connection::class])) {
+            $container[Connection::class] = function(Container $di) {
+                /** @var EntityManager $em */
+                $em = $di[EntityManager::class];
+                return $em->getConnection();
+            };
+
+            $container->addAlias('db', Connection::class);
+        }
+
+        if (!isset($container[Console\Application::class])) {
+            $container[Console\Application::class] = function(Container $di) {
+                $console = new Console\Application('Command Line Interface', '1.0.0');
+                $console->setContainer($di);
+
+                return $console;
+            };
+        }
+
+        if (!isset($container[EntityManager::class])) {
+            $container[EntityManager::class] = function (Container $di) {
+                /** @var Settings $settings */
+                $settings = $di->get('settings');
+
+                $defaults = [
+                    'autoGenerateProxies' => !$settings[Settings::IS_PRODUCTION],
+                    'proxyNamespace' => 'AppProxy',
+                    'proxyPath' => $settings[Settings::TEMP_DIR] . '/proxies',
+                    'modelPath' => $settings[Settings::BASE_DIR] . '/src/Entity',
+                    'useSecondLevelCache' => (Settings::ENV_TESTING !== $settings[Settings::APP_ENV]),
+                    'conn' => [
+                        'host'      => $_ENV['MYSQL_HOST'] ?? 'mariadb',
+                        'port'      => $_ENV['MYSQL_PORT'] ?? 3306,
+                        'dbname'    => $_ENV['MYSQL_DATABASE'],
+                        'user'      => $_ENV['MYSQL_USER'],
+                        'password'  => $_ENV['MYSQL_PASSWORD'],
+                        'driver'    => 'pdo_mysql',
+                        'charset'   => 'utf8mb4',
+                        'defaultTableOptions' => [
+                            'charset' => 'utf8mb4',
+                            'collate' => 'utf8mb4_general_ci',
+                        ],
+                        'driverOptions' => [
+                            \PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8mb4 COLLATE utf8mb4_general_ci',
+                        ],
+                        'platform' => new \Doctrine\DBAL\Platforms\MariaDb1027Platform(),
+                    ]
+                ];
+
+                if (!$settings[Settings::IS_DOCKER]) {
+                    $defaults['conn']['host'] = $_ENV['db_host'] ?? 'localhost';
+                    $defaults['conn']['port'] = $_ENV['db_port'] ?? '3306';
+                    $defaults['conn']['dbname'] = $_ENV['db_name'] ?? 'azuracast';
+                    $defaults['conn']['user'] = $_ENV['db_username'] ?? 'azuracast';
+                    $defaults['conn']['password'] = $_ENV['db_password'];
+                }
+
+                if ($settings[Settings::IS_PRODUCTION]) {
+                    /** @var \Redis $redis */
+                    $redis = $di[\Redis::class];
+                    $redis->select(2);
+
+                    $cache = new Doctrine\Cache\Redis;
+                    $cache->setRedis($redis);
+                    $defaults['cache'] = $cache;
+                } else {
+                    $defaults['cache'] = new \Doctrine\Common\Cache\ArrayCache;
+                }
+
+                $app_options = $settings[Settings::DOCTRINE_OPTIONS] ?? [];
+                $options = array_merge($defaults, $app_options);
+
+                try {
+                    // Fetch and store entity manager.
+                    $config = new \Doctrine\ORM\Configuration;
+
+                    $metadata_driver = $config->newDefaultAnnotationDriver($options['modelPath']);
+                    $config->setMetadataDriverImpl($metadata_driver);
+
+                    $repo_factory = new Doctrine\RepositoryFactory($di);
+                    $config->setRepositoryFactory($repo_factory);
+
+                    $config->setMetadataCacheImpl($options['cache']);
+                    $config->setQueryCacheImpl($options['cache']);
+                    $config->setResultCacheImpl($options['cache']);
+
+                    // Disable second-level cache for unit testing purposes, as it causes data to be out of date on pages.
+                    $config->setSecondLevelCacheEnabled($options['useSecondLevelCache']);
+
+                    $config->setProxyDir($options['proxyPath']);
+                    $config->setProxyNamespace($options['proxyNamespace']);
+                    $config->setAutoGenerateProxyClasses(\Doctrine\Common\Proxy\AbstractProxyFactory::AUTOGENERATE_FILE_NOT_EXISTS);
+                    $config->setDefaultRepositoryClassName(Doctrine\Repository::class);
+
+                    if (isset($options['conn']['debug']) && $options['conn']['debug']) {
+                        $config->setSQLLogger(new \Doctrine\DBAL\Logging\EchoSQLLogger);
+                    }
+
+                    $config->addCustomNumericFunction('RAND', Doctrine\Functions\Rand::class);
+                    $config->addCustomStringFunction('FIELD', \DoctrineExtensions\Query\Mysql\Field::class);
+                    $config->addCustomStringFunction('IF', \DoctrineExtensions\Query\Mysql\IfElse::class);
+
+                    $em = EntityManager::create($options['conn'], $config, new \Doctrine\Common\EventManager);
+
+                    return $em;
+                } catch (\Exception $e) {
+                    throw new Exception\Bootstrap($e->getMessage());
+                }
+            };
+
+            $container->addAlias('em', EntityManager::class);
         }
 
         if (!isset($container[Http\ErrorHandler::class])) {

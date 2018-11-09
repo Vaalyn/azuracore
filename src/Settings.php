@@ -19,6 +19,7 @@ class Settings extends Collection
     const TEMP_DIR          = 'temp_dir';
     const CONFIG_DIR        = 'config_dir';
     const VIEWS_DIR         = 'views_dir';
+    const DOCTRINE_OPTIONS  = 'doctrine_options';
     const IS_DOCKER         = 'is_docker';
     const IS_CLI            = 'is_cli';
 
