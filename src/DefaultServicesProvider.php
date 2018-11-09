@@ -283,6 +283,8 @@ class DefaultServicesProvider
             $container[EventDispatcher::class] = function (Container $di) {
                 $dispatcher = new EventDispatcher($di);
 
+                $dispatcher->addSubscriber(new EventHandler);
+
                 // Register application default events.
                 $settings = $di->get('settings');
 
