@@ -29,6 +29,10 @@ class App extends \Slim\App
             throw new Exception\Bootstrap('No base directory specified!');
         }
 
+        if (!($settings instanceof Settings)) {
+            $settings = new Settings($settings);
+        }
+
         if (!isset($settings[Settings::TEMP_DIR])) {
             $settings[Settings::TEMP_DIR] = dirname($settings[Settings::BASE_DIR]).'/www_tmp';
         }
@@ -58,11 +62,7 @@ class App extends \Slim\App
 
         if (file_exists($settings[Settings::CONFIG_DIR].'/settings.php')) {
             $app_settings = require($settings[Settings::CONFIG_DIR].'/settings.php');
-            $settings = array_merge($settings, $app_settings);
-        }
-
-        if (!($settings instanceof Settings)) {
-            $settings = new Settings($settings);
+            $settings->replace($app_settings);
         }
 
         $values['settings'] = $settings;
