@@ -286,10 +286,10 @@ class DefaultServicesProvider
                 $dispatcher->addSubscriber(new EventHandler);
 
                 // Register application default events.
-                $settings = $di->get('settings');
+                $settings = $di['settings'];
 
                 if (file_exists($settings[Settings::CONFIG_DIR].'/events.php')) {
-                    call_user_func($settings[Settings::CONFIG_DIR].'/events.php', $dispatcher);
+                    call_user_func(include($settings[Settings::CONFIG_DIR].'/events.php'), $dispatcher);
                 }
 
                 return $dispatcher;
@@ -303,7 +303,7 @@ class DefaultServicesProvider
                 $logger = new Logger($settings[Settings::APP_NAME] ?? 'app');
                 $logging_level = $settings[Settings::IS_PRODUCTION] ? Logger::INFO : Logger::DEBUG;
 
-                if ($settings['is_docker'] || $settings['is_cli']) {
+                if ($settings[Settings::IS_DOCKER] || $settings[Settings::IS_CLI]) {
                     $log_stderr = new \Monolog\Handler\StreamHandler('php://stderr', $logging_level, true);
                     $logger->pushHandler($log_stderr);
                 }
