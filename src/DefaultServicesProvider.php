@@ -417,7 +417,6 @@ class DefaultServicesProvider
                     'settings' => $di['settings'],
                     'router' => $di['router'],
                     'request' => $di['request'],
-                    'assets' => $di[Assets::class],
                     'flash' => $session->getFlash(),
                 ]);
 
