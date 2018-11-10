@@ -3,7 +3,7 @@ namespace Azura\Session;
 
 class Instance extends Temporary
 {
-    public function __construct(\App\Session $session, $namespace = 'default')
+    public function __construct(\Azura\Session $session, $namespace = 'default')
     {
         parent::__construct($session, $namespace);
 

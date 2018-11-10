@@ -23,6 +23,9 @@ class Settings extends Collection
     const IS_DOCKER         = 'is_docker';
     const IS_CLI            = 'is_cli';
 
+    const BASE_URL          = 'base_url';
+    const ASSETS_URL        = 'assets_url';
+
     // Slim PHP framework values
     const SLIM_HTTP_VERSION         = 'httpVersion';
     const SLIM_RESPONSE_CHUNK_SIZE  = 'responseChunkSize';
@@ -40,6 +43,8 @@ class Settings extends Collection
 
         self::IS_DOCKER     => true,
         self::IS_CLI        => ('cli' === PHP_SAPI),
+
+        self::ASSETS_URL    => '/static',
 
         self::SLIM_HTTP_VERSION         => '1.1',
         self::SLIM_RESPONSE_CHUNK_SIZE  => 4096,

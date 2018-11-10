@@ -13,7 +13,7 @@ abstract class CommandAbstract extends Command
      *
      * @param $service_name
      * @return mixed
-     * @throws \App\Exception
+     * @throws \Azura\Exception
      * @throws \Interop\Container\Exception\ContainerException
      */
     public function get($service_name)

@@ -4,7 +4,7 @@ namespace Azura\Session;
 class Temporary implements NamespaceInterface
 {
     /**
-     * @var \App\Session
+     * @var \Azura\Session
      */
     protected $_session;
 
@@ -18,7 +18,7 @@ class Temporary implements NamespaceInterface
      */
     protected $_data;
 
-    public function __construct(\App\Session $session, $namespace = 'default')
+    public function __construct(\Azura\Session $session, $namespace = 'default')
     {
         $this->_session = $session;
         $this->_namespace = $namespace;

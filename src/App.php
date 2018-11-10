@@ -60,6 +60,10 @@ class App extends \Slim\App
             $settings[Settings::SLIM_DISPLAY_ERROR_DETAILS] = true;
         }
 
+        if (isset($_ENV['BASE_URL'])) {
+            $settings[Settings::BASE_URL] = $_ENV['BASE_URL'];
+        }
+
         if (file_exists($settings[Settings::CONFIG_DIR].'/settings.php')) {
             $app_settings = require($settings[Settings::CONFIG_DIR].'/settings.php');
             $settings->replace($app_settings);

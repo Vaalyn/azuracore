@@ -7,7 +7,7 @@ use Azura\Exception;
 class Csrf
 {
     /**
-     * @var \App\Session\Instance
+     * @var \Azura\Session\Instance
      */
     protected $_session;
 

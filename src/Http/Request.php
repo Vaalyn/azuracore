@@ -1,10 +1,8 @@
 <?php
 namespace Azura\Http;
 
-use Azura\Entity;
 use Azura\Exception;
 use Azura\View;
-use Azura\Radio;
 use Azura\Session;
 use Psr\Http\Message\UriInterface;
 use Slim\Route;
@@ -13,11 +11,6 @@ class Request extends \Slim\Http\Request
 {
     const ATTRIBUTE_ROUTER = 'router';
     const ATTRIBUTE_SESSION = 'session';
-    const ATTRIBUTE_STATION = 'station';
-    const ATTRIBUTE_STATION_BACKEND = 'station_backend';
-    const ATTRIBUTE_STATION_FRONTEND = 'station_frontend';
-    const ATTRIBUTE_STATION_REMOTES = 'station_remotes';
-    const ATTRIBUTE_USER = 'user';
     const ATTRIBUTE_VIEW = 'view';
 
     /**
@@ -74,7 +67,7 @@ class Request extends \Slim\Http\Request
 
     /**
      * Get the View associated with the request, if it's set.
-     * Set by @see \App\Middleware\EnableView
+     * Set by @see \Azura\Middleware\EnableView
      *
      * @return View
      * @throws Exception
@@ -91,7 +84,7 @@ class Request extends \Slim\Http\Request
 
     /**
      * Get the application's Router.
-     * Set by @see \App\Middleware\EnableRouter
+     * Set by @see \Azura\Middleware\EnableRouter
      *
      * @return Router
      * @throws Exception
@@ -99,66 +92,6 @@ class Request extends \Slim\Http\Request
     public function getRouter(): Router
     {
         return $this->_getAttributeOfType(self::ATTRIBUTE_ROUTER, Router::class);
-    }
-
-    /**
-     * Get the current user associated with the request, if it's set.
-     * Set by @see \App\Middleware\GetCurrentUser
-     *
-     * @return Entity\User
-     * @throws Exception
-     */
-    public function getUser(): Entity\User
-    {
-        return $this->_getAttributeOfType(self::ATTRIBUTE_USER, Entity\User::class);
-    }
-
-    /**
-     * Get the current station associated with the request, if it's set.
-     * Set by @see \App\Middleware\GetStation
-     *
-     * @return Entity\Station
-     * @throws Exception
-     */
-    public function getStation(): Entity\Station
-    {
-        return $this->_getAttributeOfType(self::ATTRIBUTE_STATION, Entity\Station::class);
-    }
-
-    /**
-     * Get the current station frontend associated with the request, if it's set.
-     * Set by @see \App\Middleware\GetStation
-     *
-     * @return Radio\Frontend\FrontendAbstract
-     * @throws Exception
-     */
-    public function getStationFrontend(): Radio\Frontend\FrontendAbstract
-    {
-        return $this->_getAttributeOfType(self::ATTRIBUTE_STATION_FRONTEND, Radio\Frontend\FrontendAbstract::class);
-    }
-
-    /**
-     * Get the current station backend associated with the request, if it's set.
-     * Set by @see \App\Middleware\GetStation
-     *
-     * @return Radio\Backend\BackendAbstract
-     * @throws Exception
-     */
-    public function getStationBackend(): Radio\Backend\BackendAbstract
-    {
-        return $this->_getAttributeOfType(self::ATTRIBUTE_STATION_BACKEND, Radio\Backend\BackendAbstract::class);
-    }
-
-    /**
-     * @return Radio\Remote\AdapterProxy[]
-     */
-    public function getStationRemotes(): array
-    {
-        if ($this->hasAttribute(self::ATTRIBUTE_STATION_REMOTES)) {
-            return $this->getAttribute(self::ATTRIBUTE_STATION_REMOTES);
-        }
-
-        throw new Exception(sprintf('Attribute "%s" was not set.', self::ATTRIBUTE_STATION_REMOTES));
     }
 
     /**

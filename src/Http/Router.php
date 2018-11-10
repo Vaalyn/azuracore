@@ -1,7 +1,7 @@
 <?php
 namespace Azura\Http;
 
-use Azura\Entity\Repository\SettingsRepository;
+use Azura\Settings;
 use GuzzleHttp\Psr7\Uri;
 use GuzzleHttp\Psr7\UriResolver;
 use Psr\Http\Message\UriInterface;
@@ -39,19 +39,8 @@ class Router extends \Slim\Router
 
         if (!$base_url)
         {
-            $base_url = new Uri('');
-
-            /** @var SettingsRepository $settings_repo */
-            $settings_repo = $this->container[SettingsRepository::class];
-
-            $settings_base_url = $settings_repo->getSetting('base_url', '');
-
-            if (!empty($settings_base_url)) {
-                $base_url = new Uri('http://'.$settings_base_url);
-            }
-
-            $prefer_browser_url = (bool)$settings_repo->getSetting('prefer_browser_url', 0);
-            if ($this->current_request instanceof Request && ($prefer_browser_url || $base_url->getHost() === '')) {
+            // Use the current request's URI if applicable.
+            if ($this->current_request instanceof Request) {
                 $current_uri = $this->current_request->getUri();
 
                 $ignored_hosts = ['nginx', 'localhost'];
@@ -63,11 +52,15 @@ class Router extends \Slim\Router
                 }
             }
 
-            $always_use_ssl = (bool)$settings_repo->getSetting('always_use_ssl', 0);
-            if (APP_IS_SECURE || $always_use_ssl) {
-                $base_url = $base_url->withScheme('https');
-            } else {
-                $base_url = $base_url->withScheme('http');
+            // Check the settings for a hard-coded base URI.
+            $settings = $this->container[Settings::class];
+
+            if (!$base_url && !empty($settings[Settings::BASE_URL])) {
+                $base_url = new Uri($settings[Settings::BASE_URL]);
+            }
+
+            if (!($base_url instanceof Uri)) {
+                throw new \Azura\Exception('Base URL could not be determined.');
             }
         }
 
