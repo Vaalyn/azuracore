@@ -308,7 +308,7 @@ class DefaultServicesProvider
                     $logger->pushHandler($log_stderr);
                 }
 
-                $log_file = new \Monolog\Handler\StreamHandler($settings[Settings::TEMP_DIR] . '/azuracast.log', $logging_level, true);
+                $log_file = new \Monolog\Handler\StreamHandler($settings[Settings::TEMP_DIR] . '/app.log', $logging_level, true);
                 $logger->pushHandler($log_file);
 
                 return $logger;
