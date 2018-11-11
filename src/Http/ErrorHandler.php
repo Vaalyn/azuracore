@@ -53,6 +53,38 @@ class ErrorHandler
         $this->return_json = $return_json;
     }
 
+    /**
+     * @return bool
+     */
+    public function showDetailed(): bool
+    {
+        return $this->show_detailed;
+    }
+
+    /**
+     * @param bool $show_detailed
+     */
+    public function setShowDetailed(bool $show_detailed): void
+    {
+        $this->show_detailed = $show_detailed;
+    }
+
+    /**
+     * @return bool
+     */
+    public function returnJson(): bool
+    {
+        return $this->return_json;
+    }
+
+    /**
+     * @param bool $return_json
+     */
+    public function setReturnJson(bool $return_json): void
+    {
+        $this->return_json = $return_json;
+    }
+
     public function __invoke(Request $req, Response $res, \Throwable $e)
     {
         // Don't log errors that are internal to the application.
