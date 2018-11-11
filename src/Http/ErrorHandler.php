@@ -20,10 +20,10 @@ class ErrorHandler
     protected $view;
 
     /** @var bool */
-    protected $show_detailed;
+    protected $show_detailed = false;
 
     /** @var bool */
-    protected $return_json;
+    protected $return_json = false;
 
     /**
      * ErrorHandler constructor.
@@ -32,25 +32,18 @@ class ErrorHandler
      * @param Router $router
      * @param Session $session
      * @param View $view
-     * @param $show_detailed
-     * @param $return_json
      */
     public function __construct(
         Logger $logger,
         Router $router,
         Session $session,
-        View $view,
-        $show_detailed,
-        $return_json
+        View $view
     )
     {
         $this->logger = $logger;
         $this->router = $router;
         $this->session = $session;
         $this->view = $view;
-
-        $this->show_detailed = $show_detailed;
-        $this->return_json = $return_json;
     }
 
     /**

@@ -268,14 +268,15 @@ class DefaultServicesProvider
             $container[Http\ErrorHandler::class] = function (Container $di) {
                 $settings = $di['settings'];
 
-                return new Http\ErrorHandler(
+                $error_handler = new Http\ErrorHandler(
                     $di[Logger::class],
                     $di['router'],
                     $di[Session::class],
-                    $di[View::class],
-                    (!$settings[Settings::IS_PRODUCTION]),
-                    ($settings[Settings::IS_CLI] || $settings[Settings::APP_ENV] === Settings::ENV_TESTING)
+                    $di[View::class]
                 );
+
+                $error_handler->setShowDetailed(!$settings[Settings::IS_PRODUCTION]);
+                $error_handler->setReturnJson($settings[Settings::IS_CLI] || $settings[Settings::APP_ENV] === Settings::ENV_TESTING);
             };
         }
 
