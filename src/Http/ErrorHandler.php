@@ -1,23 +1,12 @@
 <?php
 namespace Azura\Http;
 
-use Azura\View;
-use Azura\Session;
 use Monolog\Logger;
 
 class ErrorHandler
 {
     /** @var Logger */
     protected $logger;
-
-    /** @var Session */
-    protected $session;
-
-    /** @var Router */
-    protected $router;
-
-    /** @var View */
-    protected $view;
 
     /** @var bool */
     protected $show_detailed = false;
@@ -26,24 +15,11 @@ class ErrorHandler
     protected $return_json = false;
 
     /**
-     * ErrorHandler constructor.
-     *
      * @param Logger $logger
-     * @param Router $router
-     * @param Session $session
-     * @param View $view
      */
-    public function __construct(
-        Logger $logger,
-        Router $router,
-        Session $session,
-        View $view
-    )
+    public function __construct(Logger $logger)
     {
         $this->logger = $logger;
-        $this->router = $router;
-        $this->session = $session;
-        $this->view = $view;
     }
 
     /**
@@ -91,7 +67,7 @@ class ErrorHandler
             'code' => $e->getCode(),
         ]);
 
-        // Special handling for cURL (i.e. Liquidsoap) requests.
+        // Special handling for cURL requests.
         $ua = $req->getHeaderLine('User-Agent');
 
         if (false !== stripos($ua, 'curl')) {
@@ -103,45 +79,6 @@ class ErrorHandler
 
         $show_detailed = $this->show_detailed;
         $return_json = ($req->isXhr() || $this->return_json);
-
-        if ($e instanceof \Azura\Exception\NotLoggedIn) {
-            $error_message = 'You must be logged in to access this page.';
-
-            if ($return_json) {
-                return $res
-                    ->withStatus(403)
-                    ->withJson(new Entity\Api\Error(403, $error_message));
-            }
-
-            // Redirect to login page for not-logged-in users.
-            $this->session->flash('You must be logged in to access this page.', 'red');
-
-            // Set referrer for login redirection.
-            $referrer_login = $this->session->get('login_referrer');
-            $referrer_login->url = $req->getUri()->getPath();
-
-            return $res
-                ->withStatus(302)
-                ->withHeader('Location', $this->router->named('account:login'));
-        }
-
-        if ($e instanceof \Azura\Exception\PermissionDenied) {
-            $error_message = 'You do not have permission to access this portion of the site.';
-
-            if ($return_json) {
-                return $res
-                    ->withStatus(403)
-                    ->withJson($this->_getErrorApiResponse(403, $error_message));
-            }
-
-            // Bounce back to homepage for permission-denied users.
-            $this->session->flash('You do not have permission to access this portion of the site.',
-                Session\Flash::ERROR);
-
-            return $res
-                ->withStatus(302)
-                ->withHeader('Location', $this->router->named('home'));
-        }
 
         if ($return_json) {
             $api_response = $this->_getErrorApiResponse(
