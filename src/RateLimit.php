@@ -9,7 +9,7 @@ class RateLimit
     /** @var array */
     protected $app_settings;
 
-    public function __construct(\Redis $redis, array $app_settings)
+    public function __construct(\Redis $redis, $app_settings)
     {
         $this->redis = $redis;
         $this->app_settings = $app_settings;
@@ -24,7 +24,7 @@ class RateLimit
      */
     public function checkRateLimit($group_name = 'default', $timeout = 5, $interval = 2)
     {
-        if (App::ENV_TESTING === $this->app_settings['environment'] || $this->app_settings['is_cli']) {
+        if (Settings::ENV_TESTING === $this->app_settings[Settings::APP_ENV] || $this->app_settings[Settings::IS_CLI]) {
             return true;
         }
 
