@@ -92,6 +92,6 @@ class App extends \Slim\App
         $dispatcher = $di[EventDispatcher::class];
         $dispatcher->dispatch(Event\BuildRoutes::NAME, new Event\BuildRoutes($app));
 
-        return new self($di);
+        return $app;
     }
 }
