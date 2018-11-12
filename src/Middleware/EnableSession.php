@@ -6,7 +6,7 @@ use Azura\Http\Request;
 use Azura\Http\Response;
 
 /**
- * Inject the view object into the request and prepare it for rendering templates.
+ * Inject the session object into the request.
  */
 class EnableSession
 {

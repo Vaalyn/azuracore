@@ -6,7 +6,7 @@ use Azura\Http\Response;
 use Azura\Http\Router;
 
 /**
- * Set the current route on the URL object, and inject the URL object into the
+ * Set the current route on the URL object, and inject the URL object into the router.
  */
 class EnableRouter
 {
