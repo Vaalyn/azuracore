@@ -393,7 +393,8 @@ class DefaultServicesProvider
                     ini_set('session.save_path', 'tcp://' . $redis_server . ':6379?database=1');
                 }
 
-                return new Session;
+                $app_prefix = 'APP_'.strtoupper(substr(md5($settings[Settings::BASE_DIR]), 0, 5));
+                return new Session($app_prefix);
             };
         }
 

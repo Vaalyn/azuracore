@@ -3,6 +3,8 @@ namespace Azura;
 
 class Session
 {
+    protected $app_prefix;
+
     protected $_prevent_sessions = false;
 
     protected $_is_started = false;
@@ -15,8 +17,10 @@ class Session
     /** @var Session\Csrf */
     protected $csrf;
 
-    public function __construct()
+    public function __construct($app_prefix)
     {
+        $this->app_prefix = $app_prefix;
+
         $this->flash = new Session\Flash($this);
         $this->csrf = new Session\Csrf($this);
     }
@@ -129,9 +133,7 @@ class Session
      */
     public function getNamespaceName($suffix = 'default')
     {
-        $app_hash = strtoupper(substr(md5(APP_INCLUDE_BASE), 0, 5));
-
-        return 'APP_' . $app_hash . '_' . $suffix;
+        return $this->app_prefix . '_' . $suffix;
     }
 
     /**
