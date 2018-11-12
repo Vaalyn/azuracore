@@ -29,10 +29,6 @@ class App extends \Slim\App
             throw new Exception\Bootstrap('No base directory specified!');
         }
 
-        if (!($settings instanceof Settings)) {
-            $settings = new Settings($settings);
-        }
-
         if (!isset($settings[Settings::TEMP_DIR])) {
             $settings[Settings::TEMP_DIR] = dirname($settings[Settings::BASE_DIR]).'/www_tmp';
         }
@@ -53,6 +49,11 @@ class App extends \Slim\App
 
         if (!isset($settings[Settings::APP_ENV])) {
             $settings[Settings::APP_ENV] = $_ENV['APPLICATION_ENV'] ?? Settings::ENV_PRODUCTION;
+        }
+
+        // Convert any existing settings array into a Settings object, applying default values.
+        if (!($settings instanceof Settings)) {
+            $settings = new Settings($settings);
         }
 
         if ($settings->isProduction()) {
