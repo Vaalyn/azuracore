@@ -38,7 +38,6 @@ class Settings extends Collection
     protected $data = [
         self::APP_NAME      => 'Application',
         self::APP_ENV       => self::ENV_PRODUCTION,
-        self::IS_PRODUCTION => true,
 
         self::IS_DOCKER     => true,
         self::IS_CLI        => ('cli' === PHP_SAPI),
