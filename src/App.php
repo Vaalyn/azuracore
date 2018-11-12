@@ -51,7 +51,10 @@ class App extends \Slim\App
             $_ENV = array_merge($_ENV, parse_ini_file($settings[Settings::BASE_DIR].'/env.ini'));
         }
 
-        $settings[Settings::APP_ENV] = $_ENV['APPLICATION_ENV'] ?? Settings::ENV_PRODUCTION;
+        if (!isset($settings[Settings::APP_ENV])) {
+            $settings[Settings::APP_ENV] = $_ENV['APPLICATION_ENV'] ?? Settings::ENV_PRODUCTION;
+        }
+
         $settings[Settings::IS_PRODUCTION] = (Settings::ENV_PRODUCTION === $settings[Settings::APP_ENV]);
 
         if ($settings[Settings::IS_PRODUCTION]) {
