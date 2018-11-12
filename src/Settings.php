@@ -13,7 +13,6 @@ class Settings extends Collection
     // AzuraCore settings values
     const APP_NAME          = 'name';
     const APP_ENV           = 'app_env';
-    const IS_PRODUCTION     = 'is_production';
 
     const BASE_DIR          = 'base_dir';
     const TEMP_DIR          = 'temp_dir';
@@ -57,13 +56,18 @@ class Settings extends Collection
 
     public function isProduction(): bool
     {
-        if (isset($this->data[self::IS_PRODUCTION])) {
-            return (bool)$this->data[self::IS_PRODUCTION];
-        }
         if (isset($this->data[self::APP_ENV])) {
             return (self::ENV_PRODUCTION === $this->data[self::APP_ENV]);
         }
         return true;
+    }
+
+    public function isTesting(): bool
+    {
+        if (isset($this->data[self::APP_ENV])) {
+            return (self::ENV_TESTING === $this->data[self::APP_ENV]);
+        }
+        return false;
     }
 
     public function isDocker(): bool

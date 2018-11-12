@@ -55,9 +55,7 @@ class App extends \Slim\App
             $settings[Settings::APP_ENV] = $_ENV['APPLICATION_ENV'] ?? Settings::ENV_PRODUCTION;
         }
 
-        $settings[Settings::IS_PRODUCTION] = (Settings::ENV_PRODUCTION === $settings[Settings::APP_ENV]);
-
-        if ($settings[Settings::IS_PRODUCTION]) {
+        if ($settings->isProduction()) {
             $settings[Settings::SLIM_ROUTER_CACHE_FILE] = $settings[Settings::TEMP_DIR].'/app_routes.cache.php';
         } else {
             $settings[Settings::SLIM_DISPLAY_ERROR_DETAILS] = true;
@@ -75,8 +73,8 @@ class App extends \Slim\App
         $values['settings'] = $settings;
 
         // Apply PHP settings.
-        ini_set('display_startup_errors',   !$settings[Settings::IS_PRODUCTION] ? 1 : 0);
-        ini_set('display_errors',           !$settings[Settings::IS_PRODUCTION] ? 1 : 0);
+        ini_set('display_startup_errors',   !$settings->isProduction() ? 1 : 0);
+        ini_set('display_errors',           !$settings->isProduction() ? 1 : 0);
         ini_set('log_errors',               1);
         ini_set('error_log',                $settings[Settings::IS_DOCKER] ? '/dev/stderr' : $settings[Settings::TEMP_DIR].'/php_errors.log');
         ini_set('error_reporting',          E_ALL & ~E_NOTICE & ~E_WARNING & ~E_STRICT);

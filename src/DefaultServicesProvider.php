@@ -182,7 +182,7 @@ class DefaultServicesProvider
                 $settings = $di->get('settings');
 
                 $defaults = [
-                    'autoGenerateProxies' => !$settings[Settings::IS_PRODUCTION],
+                    'autoGenerateProxies' => !$settings->isProduction(),
                     'proxyNamespace' => 'AppProxy',
                     'proxyPath' => $settings[Settings::TEMP_DIR] . '/proxies',
                     'modelPath' => $settings[Settings::BASE_DIR] . '/src/Entity',
@@ -213,7 +213,7 @@ class DefaultServicesProvider
                     $defaults['conn']['password'] = $_ENV['db_password'];
                 }
 
-                if ($settings[Settings::IS_PRODUCTION]) {
+                if ($settings->isProduction()) {
                     /** @var \Redis $redis */
                     $redis = $di[\Redis::class];
                     $redis->select(2);
@@ -268,9 +268,11 @@ class DefaultServicesProvider
             $container[Http\ErrorHandler::class] = function (Container $di) {
                 $error_handler = new Http\ErrorHandler($di[Logger::class]);
 
+                /** @var Settings $settings */
                 $settings = $di['settings'];
-                $error_handler->setShowDetailed(!$settings[Settings::IS_PRODUCTION]);
-                $error_handler->setReturnJson($settings[Settings::IS_CLI] || $settings[Settings::APP_ENV] === Settings::ENV_TESTING);
+
+                $error_handler->setShowDetailed(!$settings->isProduction());
+                $error_handler->setReturnJson($settings[Settings::IS_CLI] || $settings->isTesting());
 
                 return $error_handler;
             };
@@ -295,10 +297,11 @@ class DefaultServicesProvider
 
         if (!isset($container[Logger::class])) {
             $container[Logger::class] = function (Container $di) {
+                /** @var Settings $settings */
                 $settings = $di['settings'];
 
                 $logger = new Logger($settings[Settings::APP_NAME] ?? 'app');
-                $logging_level = $settings[Settings::IS_PRODUCTION] ? Logger::INFO : Logger::DEBUG;
+                $logging_level = $settings->isProduction() ? Logger::INFO : Logger::DEBUG;
 
                 if ($settings[Settings::IS_DOCKER] || $settings[Settings::IS_CLI]) {
                     $log_stderr = new \Monolog\Handler\StreamHandler('php://stderr', $logging_level, true);
@@ -377,9 +380,10 @@ class DefaultServicesProvider
 
         if (!isset($container[Session::class])) {
             $container[Session::class] = function (Container $di) {
+                /** @var Settings $settings */
                 $settings = $di['settings'];
 
-                if (Settings::ENV_TESTING !== $settings[Settings::APP_ENV]) {
+                if ($settings->isTesting()) {
                     ini_set('session.gc_maxlifetime', 86400);
                     ini_set('session.gc_probability', 1);
                     ini_set('session.gc_divisor', 100);
