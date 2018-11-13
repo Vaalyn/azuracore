@@ -31,6 +31,10 @@ class DefaultServicesProvider
 
         if (!isset($container['environment'])) {
             $container['environment'] = function () {
+                if (isset($_SERVER['HTTP_X_FORWARDED_PROTO'])) {
+                    $_SERVER['HTTPS'] = ('https' === strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']));
+                }
+
                 return new Environment($_SERVER);
             };
 
