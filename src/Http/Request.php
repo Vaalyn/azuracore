@@ -51,6 +51,16 @@ class Request extends \Slim\Http\Request
     }
 
     /**
+     * Shortcut to indicate if a request is secure.
+     *
+     * @return bool
+     */
+    public function isSecure(): bool
+    {
+        return ('https' === $this->getUri()->getScheme());
+    }
+
+    /**
      * Pull the current route, if it's generated yet.
      *
      * @return Route
