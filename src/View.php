@@ -48,9 +48,9 @@ class View extends \League\Plates\Engine
      * @param Response $response
      * @param null $template_name
      * @param array $template_args
-     * @return Response
+     * @return object A modified version of the $response originally sent.
      */
-    public function renderToResponse(Response $response, $template_name, array $template_args = []): Response
+    public function renderToResponse(Response $response, $template_name, array $template_args = [])
     {
         $template = $this->render($template_name, $template_args);
 
