@@ -73,10 +73,10 @@ class Timezone
         $minutes = (int)abs($remainder / 60);
 
         if ($hour === 0 && $minutes === 0) {
-            return 'GMT';
+            return 'UTC';
         }
 
-        return 'GMT ' . $sign . str_pad($hour, 2, '0', STR_PAD_LEFT) . ':' . str_pad($minutes, 2, '0');
+        return 'UTC ' . $sign . str_pad($hour, 2, '0', STR_PAD_LEFT) . ':' . str_pad($minutes, 2, '0');
     }
 
     public static function fetchSelect()
@@ -84,129 +84,28 @@ class Timezone
         static $tz_select;
 
         if (!$tz_select) {
-            $tz_options = [
-                'Africa/Cairo' => 'Cairo',
-                'Africa/Casablanca' => 'Casablanca',
-                'Africa/Harare' => 'Harare',
-                'Africa/Monrovia' => 'Monrovia',
-                'Africa/Nairobi' => 'Nairobi',
-                'America/Bogota' => 'Bogota',
-                'America/Buenos_Aires' => 'Buenos Aires',
-                'America/Caracas' => 'Caracas',
-                'America/Chihuahua' => 'Chihuahua',
-                'America/La_Paz' => 'La Paz',
-                'America/Lima' => 'Lima',
-                'America/Mazatlan' => 'Mazatlan',
-                'America/Mexico_City' => 'Mexico City',
-                'America/Monterrey' => 'Monterrey',
-                'America/Santiago' => 'Santiago',
-                'America/Tijuana' => 'Tijuana',
-                'Asia/Almaty' => 'Almaty',
-                'Asia/Baghdad' => 'Baghdad',
-                'Asia/Baku' => 'Baku',
-                'Asia/Bangkok' => 'Bangkok',
-                'Asia/Chongqing' => 'Chongqing',
-                'Asia/Dhaka' => 'Dhaka',
-                'Asia/Hong_Kong' => 'Hong Kong',
-                'Asia/Irkutsk' => 'Irkutsk',
-                'Asia/Jakarta' => 'Jakarta',
-                'Asia/Jerusalem' => 'Jerusalem',
-                'Asia/Kabul' => 'Kabul',
-                'Asia/Karachi' => 'Karachi',
-                'Asia/Kathmandu' => 'Kathmandu',
-                'Asia/Kolkata' => 'Kolkata',
-                'Asia/Krasnoyarsk' => 'Krasnoyarsk',
-                'Asia/Kuala_Lumpur' => 'Kuala Lumpur',
-                'Asia/Kuwait' => 'Kuwait',
-                'Asia/Magadan' => 'Magadan',
-                'Asia/Muscat' => 'Muscat',
-                'Asia/Novosibirsk' => 'Novosibirsk',
-                'Asia/Riyadh' => 'Riyadh',
-                'Asia/Seoul' => 'Seoul',
-                'Asia/Singapore' => 'Singapore',
-                'Asia/Taipei' => 'Taipei',
-                'Asia/Tashkent' => 'Tashkent',
-                'Asia/Tbilisi' => 'Tbilisi',
-                'Asia/Tehran' => 'Tehran',
-                'Asia/Tokyo' => 'Tokyo',
-                'Asia/Ulaanbaatar' => 'Ulaan Bataar',
-                'Asia/Urumqi' => 'Urumqi',
-                'Asia/Vladivostok' => 'Vladivostok',
-                'Asia/Yakutsk' => 'Yakutsk',
-                'Asia/Yekaterinburg' => 'Ekaterinburg',
-                'Asia/Yerevan' => 'Yerevan',
-                'Atlantic/Azores' => 'Azores',
-                'Atlantic/Cape_Verde' => 'Cape Verde Is.',
-                'Atlantic/Stanley' => 'Stanley',
-                'Australia/Adelaide' => 'Adelaide',
-                'Australia/Brisbane' => 'Brisbane',
-                'Australia/Canberra' => 'Canberra',
-                'Australia/Darwin' => 'Darwin',
-                'Australia/Hobart' => 'Hobart',
-                'Australia/Melbourne' => 'Melbourne',
-                'Australia/Perth' => 'Perth',
-                'Australia/Sydney' => 'Sydney',
-                'Canada/Atlantic' => 'Atlantic Time (Canada)',
-                'Canada/Newfoundland' => 'Newfoundland',
-                'Canada/Saskatchewan' => 'Saskatchewan',
-                'Europe/Amsterdam' => 'Amsterdam',
-                'Europe/Athens' => 'Athens',
-                'Europe/Belgrade' => 'Belgrade',
-                'Europe/Berlin' => 'Berlin',
-                'Europe/Bratislava' => 'Bratislava',
-                'Europe/Brussels' => 'Brussels',
-                'Europe/Bucharest' => 'Bucharest',
-                'Europe/Budapest' => 'Budapest',
-                'Europe/Copenhagen' => 'Copenhagen',
-                'Europe/Dublin' => 'Dublin',
-                'Europe/Helsinki' => 'Helsinki',
-                'Europe/Istanbul' => 'Istanbul',
-                'Europe/Kiev' => 'Kyiv',
-                'Europe/Lisbon' => 'Lisbon',
-                'Europe/Ljubljana' => 'Ljubljana',
-                'Europe/London' => 'London',
-                'Europe/Madrid' => 'Madrid',
-                'Europe/Minsk' => 'Minsk',
-                'Europe/Moscow' => 'Moscow',
-                'Europe/Paris' => 'Paris',
-                'Europe/Prague' => 'Prague',
-                'Europe/Riga' => 'Riga',
-                'Europe/Rome' => 'Rome',
-                'Europe/Sarajevo' => 'Sarajevo',
-                'Europe/Skopje' => 'Skopje',
-                'Europe/Sofia' => 'Sofia',
-                'Europe/Stockholm' => 'Stockholm',
-                'Europe/Tallinn' => 'Tallinn',
-                'Europe/Vienna' => 'Vienna',
-                'Europe/Vilnius' => 'Vilnius',
-                'Europe/Volgograd' => 'Volgograd',
-                'Europe/Warsaw' => 'Warsaw',
-                'Europe/Zagreb' => 'Zagreb',
-                'Pacific/Auckland' => 'Auckland',
-                'Pacific/Fiji' => 'Fiji',
-                'Pacific/Guam' => 'Guam',
-                'Pacific/Midway' => 'Midway Island',
-                'Pacific/Port_Moresby' => 'Port Moresby',
-                'US/Alaska' => 'Alaska',
-                'US/Arizona' => 'Arizona',
-                'US/Central' => 'Central Time (US & Canada)',
-                'US/East-Indiana' => 'Indiana (East)',
-                'US/Eastern' => 'Eastern Time (US & Canada)',
-                'US/Hawaii' => 'Hawaii',
-                'US/Mountain' => 'Mountain Time (US & Canada)',
-                'US/Pacific' => 'Pacific Time (US & Canada)',
-                'US/Samoa' => 'Samoa',
-            ];
-
             $tz_select = [
                 'UTC' => [
                     'UTC' => 'UTC',
                 ],
             ];
+            foreach (\DateTimeZone::listIdentifiers((\DateTimeZone::ALL ^ \DateTimeZone::ANTARCTICA ^ \DateTimeZone::UTC)) as $tz_identifier) {
+                $tz = new \DateTimeZone($tz_identifier);
+                $tz_region = substr($tz_identifier, 0, strpos($tz_identifier, '/')) ?: $tz_identifier;
+                $tz_subregion = str_replace([$tz_region.'/', '_'], ['', ' '], $tz_identifier) ?: $tz_region;
 
-            foreach ($tz_options as $tz => $tz_display) {
-                $tz_region = substr($tz, 0, strpos($tz, '/'));
-                $tz_select[$tz_region][$tz] = $tz_display;
+                $offset = $tz->getOffset(new \DateTime);
+
+                $offset_prefix = $offset < 0 ? '-' : '+';
+                $offset_formatted = gmdate(($offset % 60 === 0) ? 'G' : 'G:i', abs($offset));
+
+                $pretty_offset = ($offset === 0) ? 'UTC' : 'UTC'.$offset_prefix.$offset_formatted;
+
+                if ($tz_subregion != $tz_region) {
+                    $tz_subregion .= ' ('.$pretty_offset.')';
+                }
+
+                $tz_select[$tz_region][$tz_identifier] = $tz_subregion;
             }
         }
 
