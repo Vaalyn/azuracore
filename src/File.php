@@ -40,27 +40,9 @@ class File
         return $this->name;
     }
 
-    /**
-     * Sanitize a user-specified filename for storage.
-     * Credit to: http://stackoverflow.com/a/19018736
-     *
-     * @return mixed|string
-     */
     public function sanitizeName()
     {
-        $str = strip_tags($this->name);
-        $str = preg_replace('/[\r\n\t ]+/', ' ', $str);
-        $str = preg_replace('/[\"\*\/\:\<\>\?\'\|]+/', ' ', $str);
-        $str = strtolower($str);
-        $str = html_entity_decode( $str, ENT_QUOTES, "utf-8" );
-        $str = htmlentities($str, ENT_QUOTES, "utf-8");
-        $str = preg_replace("/(&)([a-z])([a-z]+;)/i", '$2', $str);
-        $str = str_replace(' ', '_', $str);
-        $str = rawurlencode($str);
-        $str = str_replace('%', '-', $str);
-
-        $this->name = $str;
-        return $str;
+        $this->name = self::sanitizeFileName($this->name);
     }
 
     /**
@@ -299,5 +281,27 @@ class File
     public function delete()
     {
         unlink($this->getPath());
+    }
+
+    /**
+     * Sanitize a user-specified filename for storage.
+     * Credit to: http://stackoverflow.com/a/19018736
+     *
+     * @param $str
+     * @return string
+     */
+    public static function sanitizeFileName($str): string
+    {
+        $str = strip_tags($str);
+        $str = preg_replace('/[\r\n\t ]+/', ' ', $str);
+        $str = preg_replace('/[\"\*\/\:\<\>\?\'\|]+/', ' ', $str);
+        $str = strtolower($str);
+        $str = html_entity_decode( $str, ENT_QUOTES, "utf-8" );
+        $str = htmlentities($str, ENT_QUOTES, "utf-8");
+        $str = preg_replace("/(&)([a-z])([a-z]+;)/i", '$2', $str);
+        $str = str_replace(' ', '_', $str);
+        $str = rawurlencode($str);
+        $str = str_replace('%', '-', $str);
+        return $str;
     }
 }
