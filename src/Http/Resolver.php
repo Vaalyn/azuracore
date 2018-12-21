@@ -50,14 +50,11 @@ class Resolver implements CallableResolverInterface
             };
         }
 
-        if (\is_string($toResolve)) {
-            // Check for Slim notation pattern of "class:method"
-            if (preg_match(CallableResolver::CALLABLE_PATTERN, $toResolve, $matches)) {
-                $resolved = $this->resolveCallable($matches[1], $matches[2]);
-                $this->assertCallable($resolved);
+        if (\is_string($toResolve) && preg_match(CallableResolver::CALLABLE_PATTERN, $toResolve, $matches)) {
+            $resolved = $this->resolveCallable($matches[1], $matches[2]);
+            $this->assertCallable($resolved);
 
-                return $resolved;
-            }
+            return $resolved;
         }
 
         $resolved = $this->resolveCallable($toResolve);
@@ -77,7 +74,7 @@ class Resolver implements CallableResolverInterface
      * @throws \Psr\Container\ContainerExceptionInterface
      * @throws \Psr\Container\NotFoundExceptionInterface
      */
-    protected function resolveCallable($class, $method = '__invoke', $args = array())
+    protected function resolveCallable($class, $method = '__invoke', $args = array()): callable
     {
         if ($this->di->has($class)) {
             return [$this->di->get($class), $method];

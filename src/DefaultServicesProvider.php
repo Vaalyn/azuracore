@@ -190,6 +190,7 @@ class DefaultServicesProvider
                     'proxyNamespace' => 'AppProxy',
                     'proxyPath' => $settings[Settings::TEMP_DIR] . '/proxies',
                     'modelPath' => $settings[Settings::BASE_DIR] . '/src/Entity',
+                    'useSimpleAnnotations' => false,
                     'conn' => [
                         'host'      => $_ENV['MYSQL_HOST'] ?? 'mariadb',
                         'port'      => $_ENV['MYSQL_PORT'] ?? 3306,
@@ -236,7 +237,7 @@ class DefaultServicesProvider
                     // Fetch and store entity manager.
                     $config = new \Doctrine\ORM\Configuration;
 
-                    $metadata_driver = $config->newDefaultAnnotationDriver($options['modelPath']);
+                    $metadata_driver = $config->newDefaultAnnotationDriver($options['modelPath'], $options['useSimpleAnnotations']);
                     $config->setMetadataDriverImpl($metadata_driver);
 
                     $repo_factory = new Doctrine\RepositoryFactory($di);
