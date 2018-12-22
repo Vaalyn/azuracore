@@ -3,6 +3,7 @@ namespace Azura;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Common\Cache\Cache as DoctrineCache;
 use GuzzleHttp\Client;
 use Monolog\Logger;
 use Psr\Http\Message\ResponseInterface;
@@ -180,12 +181,33 @@ class DefaultServicesProvider
             };
         }
 
+        if (!isset($container[DoctrineCache::class])) {
+            $container[DoctrineCache::class] = function(Container $di) {
+                /** @var Settings $settings */
+                $settings = $di->get('settings');
+
+                if ($settings->isProduction()) {
+                    /** @var \Redis $redis */
+                    $redis = $di[\Redis::class];
+                    $redis->select(2);
+
+                    $cache = new Doctrine\Cache\Redis;
+                    $cache->setRedis($redis);
+
+                    return $cache;
+                }
+
+                return new \Doctrine\Common\Cache\ArrayCache;
+            };
+        }
+
         if (!isset($container[EntityManager::class])) {
             $container[EntityManager::class] = function (Container $di) {
                 /** @var Settings $settings */
                 $settings = $di->get('settings');
 
                 $defaults = [
+                    'cache'     => $di[DoctrineCache::class],
                     'autoGenerateProxies' => !$settings->isProduction(),
                     'proxyNamespace' => 'AppProxy',
                     'proxyPath' => $settings[Settings::TEMP_DIR] . '/proxies',
@@ -216,18 +238,6 @@ class DefaultServicesProvider
                     $defaults['conn']['dbname'] = $_ENV['db_name'] ?? 'azuracast';
                     $defaults['conn']['user'] = $_ENV['db_username'] ?? 'azuracast';
                     $defaults['conn']['password'] = $_ENV['db_password'];
-                }
-
-                if ($settings->isProduction()) {
-                    /** @var \Redis $redis */
-                    $redis = $di[\Redis::class];
-                    $redis->select(2);
-
-                    $cache = new Doctrine\Cache\Redis;
-                    $cache->setRedis($redis);
-                    $defaults['cache'] = $cache;
-                } else {
-                    $defaults['cache'] = new \Doctrine\Common\Cache\ArrayCache;
                 }
 
                 $app_options = $settings[Settings::DOCTRINE_OPTIONS] ?? [];
