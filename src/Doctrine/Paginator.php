@@ -26,7 +26,10 @@ class Paginator
     protected $max_per_page = 50;
 
     /** @var bool Whether the current request is from jQuery Bootgrid */
-    protected $is_bootgrid;
+    protected $is_bootgrid = false;
+
+    /** @var bool Whether to show pagination controls. */
+    protected $is_disabled = false;
 
     /** @var callable|null A callable postprocessor that can be run on each result. */
     protected $postprocessor;
@@ -62,6 +65,7 @@ class Paginator
     public function setMaxPerPage(int $max_per_page): void
     {
         $this->max_per_page = ($max_per_page > 0) ? $max_per_page : 1;
+        $this->is_disabled = false;
     }
 
     public function setPerPage(int $per_page): void
@@ -71,6 +75,8 @@ class Paginator
         } else {
             $this->per_page = -1;
         }
+
+        $this->is_disabled = false;
     }
 
     public function getPerPage(): int
@@ -95,6 +101,7 @@ class Paginator
 
     public function setFromRequest(Request $request)
     {
+        $this->is_disabled = true;
         $this->is_bootgrid = $request->hasParam('rowCount') || $request->hasParam('searchPhrase');
 
         if ($this->is_bootgrid) {
@@ -102,10 +109,10 @@ class Paginator
             $this->setPerPage((int)$request->getParam('rowCount'));
         } else {
             if ($request->hasParam('page')) {
-                $this->setCurrentPage($request->getParam('page'));
+                $this->setCurrentPage((int)$request->getParam('page'));
             }
             if ($request->hasParam('per_page')) {
-                $this->setPerPage($request->getParam('per_page'));
+                $this->setPerPage((int)$request->getParam('per_page'));
             }
         }
 
@@ -115,6 +122,22 @@ class Paginator
     public function setPostprocessor(callable $postprocessor)
     {
         $this->postprocessor = $postprocessor;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDisabled(): bool
+    {
+        return $this->is_disabled;
+    }
+
+    /**
+     * @param bool $is_disabled
+     */
+    public function setIsDisabled(bool $is_disabled): void
+    {
+        $this->is_disabled = $is_disabled;
     }
 
     public function getPaginator()
@@ -160,6 +183,10 @@ class Paginator
                 'total'     => $paginator->count(),
                 'rows'      => $results,
             ]);
+        }
+
+        if ($this->is_disabled) {
+            return $response->withJson($results);
         }
 
         $page_links = [];
