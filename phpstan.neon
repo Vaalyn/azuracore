@@ -1,0 +1,10 @@
+parameters:
+    level: 2
+
+    paths:
+        - src
+
+    universalObjectCratesClasses:
+        - Azura\Session\NamespaceInterface
+        - Azura\View
+        - Doctrine\Common\Persistence\Mapping\ClassMetadata

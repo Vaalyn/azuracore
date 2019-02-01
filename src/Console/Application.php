@@ -29,7 +29,7 @@ class Application extends \Symfony\Component\Console\Application
     }
 
     /**
-     * @param $service_name
+     * @param string $service_name
      * @return mixed
      * @throws \Azura\Exception
      */

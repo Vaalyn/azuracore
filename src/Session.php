@@ -3,7 +3,11 @@ namespace Azura;
 
 class Session
 {
+    /** @var string */
     protected $app_prefix;
+
+    /** @var Settings */
+    protected $app_settings;
 
     protected $_prevent_sessions = false;
 
@@ -17,9 +21,10 @@ class Session
     /** @var Session\Csrf */
     protected $csrf;
 
-    public function __construct($app_prefix)
+    public function __construct($app_prefix, Settings $app_settings)
     {
         $this->app_prefix = $app_prefix;
+        $this->app_settings = $app_settings;
 
         $this->flash = new Session\Flash($this);
         $this->csrf = new Session\Csrf($this);
@@ -38,7 +43,7 @@ class Session
     /**
      * Shortcut for $this->getFlash()->addMessage()
      *
-     * @param $message
+     * @param string $message
      * @param string $level
      * @param bool $save_in_session
      */
@@ -185,7 +190,7 @@ class Session
      */
     public function isActive()
     {
-        if (APP_IS_COMMAND_LINE && !APP_TESTING_MODE) {
+        if ($this->app_settings[Settings::IS_CLI] && !$this->app_settings->isTesting()) {
             return false;
         }
 

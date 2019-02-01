@@ -226,7 +226,8 @@ class DefaultServicesProvider
                             'collate' => 'utf8mb4_general_ci',
                         ],
                         'driverOptions' => [
-                            \PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8mb4 COLLATE utf8mb4_general_ci',
+                            // PDO::MYSQL_ATTR_INIT_COMMAND = 1002;
+                            1002 => 'SET NAMES utf8mb4 COLLATE utf8mb4_general_ci',
                         ],
                         'platform' => new \Doctrine\DBAL\Platforms\MariaDb1027Platform(),
                     ]
@@ -409,7 +410,7 @@ class DefaultServicesProvider
                 }
 
                 $app_prefix = 'APP_'.strtoupper(substr(md5($settings[Settings::BASE_DIR]), 0, 5));
-                return new Session($app_prefix);
+                return new Session($app_prefix, $settings);
             };
         }
 

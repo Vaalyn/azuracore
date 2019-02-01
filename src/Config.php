@@ -37,7 +37,7 @@ class Config
     /**
      * Indicate whether a given configuration file name exists.
      *
-     * @param $name
+     * @param string $name
      * @return bool
      */
     public function has($name): bool
@@ -48,7 +48,7 @@ class Config
     /**
      * Return the configuration path resolved by the specified name.
      *
-     * @param $name
+     * @param string $name
      * @return string
      */
     public function _getPath($name)

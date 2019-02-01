@@ -6,7 +6,7 @@ class Csv
     /**
      * Generate a CSV-compatible file body given an array.
      *
-     * @param $table_data
+     * @param array $table_data
      * @param bool $headers_first_row
      * @return string
      */

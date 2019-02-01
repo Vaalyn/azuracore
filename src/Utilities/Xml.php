@@ -6,7 +6,7 @@ class Xml
     /**
      * Convert from an XML string into a PHP array.
      *
-     * @param $xml
+     * @param string $xml
      * @return array
      */
     public static function xmlToArray($xml)
@@ -66,7 +66,7 @@ class Xml
     /**
      * Convert a PHP array into an XML string.
      *
-     * @param $array
+     * @param array $array
      * @return mixed
      */
     public static function arrayToXml($array)

@@ -34,7 +34,7 @@ class RateLimit
         $result = $this->redis->get($cache_name);
 
         if ($result !== false) {
-            if ($result + 1 > $interval) {
+            if ((int)$result + 1 > $interval) {
                 throw new Exception\RateLimitExceeded();
             } else {
                 $this->redis->incr($cache_name);

@@ -28,8 +28,8 @@ class Temporary implements NamespaceInterface
     /**
      * Magic Method __set
      *
-     * @param $name
-     * @param $value
+     * @param mixed $name
+     * @param mixed $value
      */
     public function __set($name, $value)
     {
@@ -50,7 +50,7 @@ class Temporary implements NamespaceInterface
     /**
      * Magic Method __get
      *
-     * @param $name
+     * @param mixed $name
      * @return mixed
      */
     public function __get($name)
@@ -76,7 +76,7 @@ class Temporary implements NamespaceInterface
     /**
      * Magic Method __isset
      *
-     * @param $name
+     * @param mixed $name
      * @return bool
      */
     public function __isset($name)
@@ -98,7 +98,7 @@ class Temporary implements NamespaceInterface
     /**
      * Magic Method __unset
      *
-     * @param $name
+     * @param mixed $name
      */
     public function __unset($name)
     {

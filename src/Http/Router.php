@@ -103,7 +103,7 @@ class Router extends \Slim\Router
     /**
      * Simpler format for calling "named" routes with parameters.
      *
-     * @param $route_name
+     * @param string $route_name
      * @param array $route_params
      * @param array $query_params
      * @param boolean $absolute Whether to include the full URL.

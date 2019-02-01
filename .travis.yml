@@ -1,0 +1,21 @@
+git:
+  depth: 1
+env:
+  DOCKER_COMPOSE_VERSION: 1.19.0
+sudo: required
+dist: trusty
+services:
+- docker
+before_install:
+- sudo apt-get update
+- sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
+- sudo rm /usr/local/bin/docker-compose
+- curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname
+  -s`-`uname -m` > docker-compose
+- chmod +x docker-compose
+- sudo mv docker-compose /usr/local/bin
+script:
+- docker-compose run --rm cli composer test
+notifications:
+  slack:
+    secure: F54k8nZN7n9N1xUXgbjHg+OpsR7rrWvCEtgs157cLrpAglM5PGWS6RS0/Zm4ksxjqrSMtoL0MFeC3a6BfLshShAc6zLZkZGzzEP2ZIA3VJVU7aspsfyxlGMelBQN5e+YNZz8LJMJYjnNNI23kng+y8MDqcvPi2FLrPC0BEPuzhDmZ8DWmVCguRXTA0tc3444cAHeM4acmHnxGAVwon/4SNHjL2jzHGStf8NMaidA3qeVy+KAPVvA6/BqJL9Kr3weVlWjPZXh4qif9LnjSoblYi5OqXwUYUjIbX0LjlhqrLW+kCiwRDP/nJ0iD3UTOSP7+bEU8B+dsEfTt5PouQVr+Tr+061t5VrTxOjHf5e2ZC4cFIgcwjjCZt2UohQZWfRDCcfzvTGg3lbzPwWx5NQjABcfHTtJmZmmHqb6fIWfjXOCGuknJGNBMWbPSuhApDSoqSx34G7IV0m3xI4ewEoL8VyyHAYTi/QucRk2TQAv1WVsdwqh27oEQicZKTmnU+QwRPla/qnfU1bUhs8CB00oIlJGu8OB+GfpyIKzqZ8/Vc/N0ZUs7wOJw/1BOT1WkZTcL8majKQGQGqbCgRZtYYeUOPnL2/m7pY13ou4AHID4ENLwcYSfZKUvjYHQHl3IhSFPTENebmjYMDysHq959yoBQPMHv2NVJmOLxV/7hanLVs=

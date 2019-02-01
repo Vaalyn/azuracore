@@ -11,10 +11,8 @@ abstract class CommandAbstract extends Command
     /**
      * Return a Dependency Injection service.
      *
-     * @param $service_name
+     * @param string $service_name
      * @return mixed
-     * @throws \Azura\Exception
-     * @throws \Interop\Container\Exception\ContainerException
      */
     public function get($service_name)
     {
@@ -26,7 +24,7 @@ abstract class CommandAbstract extends Command
 
     /**
      * @param OutputInterface $output
-     * @param $command_name
+     * @param string $command_name
      * @param array $command_args
      * @throws \Exception
      */

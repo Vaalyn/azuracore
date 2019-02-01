@@ -55,7 +55,7 @@ class Response extends \Slim\Http\Response
     /**
      * Stream the contents of a file directly through to the response.
      *
-     * @param $file_path
+     * @param string $file_path
      * @param null $file_name
      * @return self
      */

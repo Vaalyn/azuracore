@@ -38,7 +38,7 @@ class Cache
     /**
      * Attempt to load an item from cache, or return default value if not found.
      *
-     * @param $id
+     * @param string $id
      * @param null $default
      * @return mixed|null
      */
@@ -56,7 +56,7 @@ class Cache
     /**
      * Alias of the "load" function.
      *
-     * @param $id
+     * @param string $id
      * @param null $default
      * @return mixed|null
      */
@@ -68,7 +68,7 @@ class Cache
     /**
      * Test whether an ID is present in the cache.
      *
-     * @param $id
+     * @param string $id
      * @return bool
      */
     public function test($id)
@@ -80,8 +80,8 @@ class Cache
     /**
      * Save an item to the cache.
      *
-     * @param $data
-     * @param $id
+     * @param mixed $data
+     * @param string $id
      * @param int|null $ttl
      */
     public function save($data, $id, $ttl = null)
@@ -100,8 +100,8 @@ class Cache
     /**
      * Alias for the "save" function.
      *
-     * @param $data
-     * @param $id
+     * @param mixed $data
+     * @param string $id
      * @param int|null $ttl
      */
     public function set($data, $id, $ttl = null)
@@ -113,9 +113,9 @@ class Cache
      * Combination of the "get" and "set" functions to return an existing cache
      * item or set it if one doesn't exist.
      *
-     * @param $id
-     * @param null $default
-     * @param bool|false $ttl
+     * @param string $id
+     * @param mixed|null $default
+     * @param float|int|bool $ttl
      * @return mixed|null
      */
     public function getOrSet($id, $default = null, $ttl = false)
@@ -145,7 +145,7 @@ class Cache
     /**
      * Delete an item from the cache.
      *
-     * @param $id
+     * @param string $id
      * @return void
      */
     public function remove($id)

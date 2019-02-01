@@ -20,7 +20,7 @@ class RateLimit
     /**
      * @param Request $request
      * @param Response $response
-     * @param $next
+     * @param callable $next
      * @param string $rl_group
      * @param int $rl_timeout
      * @param int $rl_interval

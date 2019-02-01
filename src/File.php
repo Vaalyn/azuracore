@@ -25,7 +25,7 @@ class File
     }
 
     /**
-     * @param $file_name
+     * @param string $file_name
      */
     public function setName($file_name)
     {
@@ -48,7 +48,7 @@ class File
     /**
      * Add a suffix to a file *before* its extension.
      *
-     * @param $suffix
+     * @param string $suffix
      * @return $this
      */
     public function addSuffix($suffix)
@@ -93,7 +93,7 @@ class File
     /**
      * Check if an uploaded file (from the $_FILES array) is valid.
      *
-     * @param $uploaded_file
+     * @param array $uploaded_file
      * @return bool
      */
     public function isValid($uploaded_file)
@@ -104,7 +104,7 @@ class File
     /**
      * Attempt to move an uploaded file to the file name specified by the object.
      *
-     * @param $uploaded_file
+     * @param array|object $uploaded_file
      * @return bool
      * @throws Exception
      */
@@ -161,8 +161,8 @@ class File
      * Create the specified file containing a string passed to the function.
      * Passes flags on to file_put_contents.
      *
-     * @param $file_data
-     * @param null $flags
+     * @param string $file_data
+     * @param mixed|null $flags
      * @return $this
      */
     public function putContents($file_data, $flags = null)
@@ -175,7 +175,6 @@ class File
     /**
      * Return the file's contents as a string.
      *
-     * @param $file_name
      * @return string
      */
     public function getContents()
@@ -258,7 +257,7 @@ class File
     /**
      * Rename the file to the new name specified, preserving the base directory.
      *
-     * @param $new_name
+     * @param string $new_name
      * @return $this
      */
     public function rename($new_name)
@@ -287,7 +286,7 @@ class File
      * Sanitize a user-specified filename for storage.
      * Credit to: http://stackoverflow.com/a/19018736
      *
-     * @param $str
+     * @param string $str
      * @return string
      */
     public static function sanitizeFileName($str): string

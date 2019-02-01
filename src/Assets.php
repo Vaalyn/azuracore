@@ -130,7 +130,7 @@ class Assets
     /**
      * Add a single javascript file.
      *
-     * @param $js_script
+     * @param string|array $js_script
      * @return $this
      */
     public function addJs($js_script): self
@@ -150,7 +150,7 @@ class Assets
     /**
      * Add a single javascript inline script.
      *
-     * @param $js_script
+     * @param string|array $js_script
      * @return $this
      */
     public function addInlineJs($js_script, $order = 100): self
@@ -168,7 +168,7 @@ class Assets
     /**
      * Add a single CSS file.
      *
-     * @param $css_script
+     * @param string|array $css_script
      * @return $this
      */
     public function addCss($css_script, $order = 100): self
@@ -188,7 +188,7 @@ class Assets
     /**
      * Add a single inline CSS file[s].
      *
-     * @param $css_script
+     * @param string|array $css_script
      * @return $this
      */
     public function addInlineCss($css_script): self
@@ -333,7 +333,7 @@ class Assets
     /**
      * Resolve the URI of the resource, whether local or remote/CDN-based.
      *
-     * @param $resource_uri
+     * @param string $resource_uri
      * @return string The resolved resource URL.
      */
     protected function _getUrl($resource_uri)
@@ -353,7 +353,7 @@ class Assets
     /**
      * Add the loaded domain to the full list of CSP-approved domains.
      *
-     * @param $files
+     * @param string $src
      */
     protected function _addDomainToCsp($src)
     {

@@ -9,7 +9,7 @@ class Repository extends EntityRepository
     /**
      * Combination of find() and toArray() helper functions.
      *
-     * @param $id
+     * @param mixed $id
      * @param bool $deep
      * @param bool $form_mode
      * @return array|null

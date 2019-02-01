@@ -71,7 +71,7 @@ class Csrf
     /**
      * Verify a supplied CSRF token against the tokens stored in the session.
      *
-     * @param $key
+     * @param string $key
      * @param string $namespace
      * @throws Exception\CsrfValidation
      */

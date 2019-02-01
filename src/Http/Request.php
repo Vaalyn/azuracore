@@ -9,9 +9,9 @@ use Slim\Route;
 
 class Request extends \Slim\Http\Request
 {
-    const ATTRIBUTE_ROUTER = 'router';
-    const ATTRIBUTE_SESSION = 'session';
-    const ATTRIBUTE_VIEW = 'view';
+    public const ATTRIBUTE_ROUTER = 'router';
+    public const ATTRIBUTE_SESSION = 'session';
+    public const ATTRIBUTE_VIEW = 'view';
 
     /**
      * Get the current URI with redundant "http://url:80/" and "https://url:443/" filtered out.
@@ -42,7 +42,7 @@ class Request extends \Slim\Http\Request
     /**
      * Detect if an attribute exists in the request.
      *
-     * @param $key
+     * @param  string $key
      * @return bool
      */
     public function hasAttribute($key): bool
@@ -118,8 +118,8 @@ class Request extends \Slim\Http\Request
     /**
      * Internal handler for retrieving attributes from the request and verifying their type.
      *
-     * @param $attribute_name
-     * @param $attribute_class
+     * @param string $attribute_name
+     * @param string $attribute_class
      * @return mixed
      * @throws Exception
      */

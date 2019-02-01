@@ -8,10 +8,10 @@ use Azura\Session;
  */
 class Flash
 {
-    const SUCCESS = 'success';
-    const WARNING = 'warning';
-    const ERROR = 'error';
-    const INFO = 'info';
+    public const SUCCESS = 'success';
+    public const WARNING = 'warning';
+    public const ERROR = 'error';
+    public const INFO = 'info';
 
     protected $messages = [];
 
@@ -32,7 +32,7 @@ class Flash
     /**
      * Add a message to the flash message queue.
      *
-     * @param $message
+     * @param string $message
      * @param string $level
      * @param bool|false $save_in_session
      */
@@ -69,7 +69,7 @@ class Flash
     /**
      * Alias of addMessage.
      *
-     * @param $message
+     * @param string $message
      * @param string $level
      * @param bool $save_in_session
      */

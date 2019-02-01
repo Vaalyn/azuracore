@@ -28,8 +28,6 @@ class Resolver implements CallableResolverInterface
     /**
      * @param mixed $toResolve
      * @return callable
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
      */
     public function resolve($toResolve)
     {
@@ -70,9 +68,6 @@ class Resolver implements CallableResolverInterface
      * @param string $method
      * @param array $args Additional arguments to pass to the constructor.
      * @return callable
-     *
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
      */
     protected function resolveCallable($class, $method = '__invoke', $args = array()): callable
     {
@@ -89,8 +84,6 @@ class Resolver implements CallableResolverInterface
 
     /**
      * @param Callable $callable
-     *
-     * @throws \RuntimeException if the callable is not resolvable
      */
     protected function assertCallable($callable)
     {

@@ -6,33 +6,33 @@ use Slim\Collection;
 class Settings extends Collection
 {
     // Environments
-    const ENV_DEVELOPMENT   = 'development';
-    const ENV_TESTING       = 'testing';
-    const ENV_PRODUCTION    = 'production';
+    public const ENV_DEVELOPMENT   = 'development';
+    public const ENV_TESTING       = 'testing';
+    public const ENV_PRODUCTION    = 'production';
 
     // AzuraCore settings values
-    const APP_NAME          = 'name';
-    const APP_ENV           = 'app_env';
+    public const APP_NAME          = 'name';
+    public const APP_ENV           = 'app_env';
 
-    const BASE_DIR          = 'base_dir';
-    const TEMP_DIR          = 'temp_dir';
-    const CONFIG_DIR        = 'config_dir';
-    const VIEWS_DIR         = 'views_dir';
-    const DOCTRINE_OPTIONS  = 'doctrine_options';
-    const IS_DOCKER         = 'is_docker';
-    const IS_CLI            = 'is_cli';
+    public const BASE_DIR          = 'base_dir';
+    public const TEMP_DIR          = 'temp_dir';
+    public const CONFIG_DIR        = 'config_dir';
+    public const VIEWS_DIR         = 'views_dir';
+    public const DOCTRINE_OPTIONS  = 'doctrine_options';
+    public const IS_DOCKER         = 'is_docker';
+    public const IS_CLI            = 'is_cli';
 
-    const BASE_URL          = 'base_url';
-    const ASSETS_URL        = 'assets_url';
+    public const BASE_URL          = 'base_url';
+    public const ASSETS_URL        = 'assets_url';
 
     // Slim PHP framework values
-    const SLIM_HTTP_VERSION         = 'httpVersion';
-    const SLIM_RESPONSE_CHUNK_SIZE  = 'responseChunkSize';
-    const SLIM_OUTPUT_BUFFERING     = 'outputBuffering';
-    const SLIM_ROUTE_BEFORE_MIDDLEWARE = 'determineRouteBeforeAppMiddleware';
-    const SLIM_DISPLAY_ERROR_DETAILS = 'displayErrorDetails';
-    const SLIM_ADD_CONTENT_LENGTH   = 'addContentLengthHeader';
-    const SLIM_ROUTER_CACHE_FILE    = 'routerCacheFile';
+    public const SLIM_HTTP_VERSION         = 'httpVersion';
+    public const SLIM_RESPONSE_CHUNK_SIZE  = 'responseChunkSize';
+    public const SLIM_OUTPUT_BUFFERING     = 'outputBuffering';
+    public const SLIM_ROUTE_BEFORE_MIDDLEWARE = 'determineRouteBeforeAppMiddleware';
+    public const SLIM_DISPLAY_ERROR_DETAILS = 'displayErrorDetails';
+    public const SLIM_ADD_CONTENT_LENGTH   = 'addContentLengthHeader';
+    public const SLIM_ROUTER_CACHE_FILE    = 'routerCacheFile';
 
     // Default settings
     protected $data = [
