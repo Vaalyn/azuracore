@@ -106,7 +106,7 @@ class Repository extends EntityRepository
      */
     public function toArray($entity, $deep = false, $form_mode = false)
     {
-        return $this->_getSerializer()->normalize($entity, [
+        return $this->_getSerializer()->normalize($entity, null, [
             DoctrineEntityNormalizer::DEEP_NORMALIZE            => $deep,
             DoctrineEntityNormalizer::NORMALIZE_TO_IDENTIFIERS  => $form_mode,
         ]);
