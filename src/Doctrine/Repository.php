@@ -1,7 +1,7 @@
 <?php
 namespace Azura\Doctrine;
 
-use Doctrine\Common\Collections\Collection;
+use Azura\Normalizer\DoctrineEntityNormalizer;
 use Doctrine\ORM\EntityRepository;
 
 class Repository extends EntityRepository
@@ -90,100 +90,11 @@ class Repository extends EntityRepository
      */
     public function fromArray($entity, array $source)
     {
-        $metadata = $this->_getMetadata($entity);
+        $normalizer = new DoctrineEntityNormalizer($this->_em);
 
-        $meta = $metadata['meta'];
-        $mappings = $metadata['mappings'];
-
-        foreach ((array)$source as $field => $value) {
-            if (isset($mappings[$field])) {
-                $mapping = $mappings[$field];
-
-                switch ($mapping['type']) {
-                    case "one_id":
-                        $entity_field = $mapping['name'];
-                        $entity_id = $mapping['ids'][0];
-
-                        if (empty($value)) {
-                            $this->_set($entity, $field, null);
-                            $this->_set($entity, $entity_field, null);
-                        } else {
-                            if ($value != $this->_get($entity, $field)) {
-                                $obj_class = $mapping['entity'];
-                                $obj = $this->_em->find($obj_class, $value);
-
-                                if ($obj instanceof $obj_class) {
-                                    $this->_set($entity, $field, $this->_get($obj, $entity_id));
-                                    $this->_set($entity, $entity_field, $obj);
-                                }
-                            }
-                        }
-                        break;
-
-                    case "one_entity":
-                        $entity_id = $mapping['ids'][0];
-                        $id_field = $mapping['name'];
-
-                        if (empty($value)) {
-                            $this->_set($entity, $field, null);
-                            $this->_set($entity, $id_field, null);
-                        } else {
-                            if ($this->_get($value, $entity_id) != $this->_get($entity, $field)) {
-                                $this->_set($entity, $field, $value);
-                                $this->_set($entity, $id_field, $this->_get($value, $entity_id));
-                            }
-                        }
-                        break;
-
-                    case "many":
-                        $obj_class = $mapping['entity'];
-
-                        if ($mapping['is_owning_side']) {
-                            /** @var Collection $collection */
-                            $collection = $this->_get($entity, $field);
-
-                            $collection->clear();
-
-                            if ($value) {
-                                foreach ((array)$value as $field_id) {
-                                    if (($field_item = $this->_em->find($obj_class, (int)$field_id)) instanceof $obj_class) {
-                                        $collection->add($field_item);
-                                    }
-                                }
-                            }
-                        } else {
-                            $foreign_field = $mapping['mappedBy'];
-
-                            if (count($this->_get($entity, $field)) > 0) {
-                                foreach ($this->_get($entity, $field) as $record) {
-                                    /** @var Collection $collection */
-                                    $collection = $this->_get($record, $foreign_field);
-                                    $collection->removeElement($entity);
-
-                                    $this->_em->persist($record);
-                                }
-                            }
-
-                            foreach ((array)$value as $field_id) {
-                                $record = $this->_em->find($obj_class, (int)$field_id);
-
-                                if ($record instanceof $obj_class) {
-                                    /** @var Collection $collection */
-                                    $collection = $this->_get($record, $foreign_field);
-                                    $collection->add($entity);
-
-                                    $this->_em->persist($record);
-                                }
-                            }
-
-                            $this->_em->flush();
-                        }
-                        break;
-                }
-            } else {
-                $this->_set($entity, $field, $value);
-            }
-        }
+        return $normalizer->denormalize($source, get_class($entity), null, [
+            DoctrineEntityNormalizer::OBJECT_TO_POPULATE => $entity,
+        ]);
     }
 
     /**
@@ -196,126 +107,12 @@ class Repository extends EntityRepository
      */
     public function toArray($entity, $deep = false, $form_mode = false)
     {
-        $return_arr = [];
+        $normalizer = new DoctrineEntityNormalizer($this->_em);
 
-        $class_meta = $this->_em->getClassMetadata(get_class($entity));
-
-        $reflect = new \ReflectionClass($entity);
-        $props = $reflect->getProperties(\ReflectionProperty::IS_PUBLIC | \ReflectionProperty::IS_PROTECTED);
-
-        if ($props) {
-            foreach ($props as $property) {
-                $property->setAccessible(true);
-                $prop_name = $property->getName();
-                $prop_val = $this->_get($entity, $prop_name) ?? $property->getValue($entity);
-
-                if (isset($class_meta->fieldMappings[$prop_name])) {
-                    $prop_info = $class_meta->fieldMappings[$prop_name];
-                } else {
-                    $prop_info = [];
-                }
-
-                if (is_array($prop_val)) {
-                    $return_arr[$prop_name] = $prop_val;
-                } else {
-                    if (!is_object($prop_val)) {
-                        if ($prop_info['type'] == "array") {
-                            $return_arr[$prop_name] = (array)$prop_val;
-                        } else {
-                            $return_arr[$prop_name] = (string)$prop_val;
-                        }
-                    } else {
-                        if ($prop_val instanceof \DateTime) {
-                            $return_arr[$prop_name] = $prop_val->getTimestamp();
-                        } else {
-                            if ($deep) {
-                                if ($prop_val instanceof \Doctrine\Common\Collections\Collection) {
-                                    $return_val = [];
-                                    if (count($prop_val) > 0) {
-                                        foreach ($prop_val as $val_obj) {
-                                            if ($form_mode) {
-                                                $obj_meta = $this->_em->getClassMetadata(get_class($val_obj));
-                                                $id_field = $obj_meta->identifier;
-
-                                                if ($id_field && count($id_field) == 1) {
-                                                    $return_val[] = $this->_get($val_obj, $id_field[0]);
-                                                }
-                                            } else {
-                                                $return_val[] = $this->toArray($val_obj, false);
-                                            }
-                                        }
-                                    }
-
-                                    $return_arr[$prop_name] = $return_val;
-                                } else {
-                                    $return_arr[$prop_name] = $this->toArray($prop_val, false);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        return $return_arr;
-    }
-
-    /**
-     * Internal function for pulling metadata, used in toArray and fromArray
-     *
-     * @param object $source_entity
-     * @return array
-     */
-    protected function _getMetadata($source_entity)
-    {
-        $class = get_class($source_entity);
-
-        $meta_result = [];
-        $meta_result['em'] = $this->_em;
-        $meta_result['factory'] = $this->_em->getMetadataFactory();
-        $meta_result['meta'] = $meta_result['factory']->getMetadataFor($class);
-        $meta_result['mappings'] = [];
-
-        if ($meta_result['meta']->associationMappings) {
-            foreach ($meta_result['meta']->associationMappings as $mapping_name => $mapping_info) {
-                $entity = $mapping_info['targetEntity'];
-
-                if (isset($mapping_info['joinTable'])) {
-                    $meta_result['mappings'][$mapping_info['fieldName']] = [
-                        'type' => 'many',
-                        'entity' => $entity,
-                        'is_owning_side' => ($mapping_info['isOwningSide'] == 1),
-                        'mappedBy' => $mapping_info['mappedBy'],
-                    ];
-                } else {
-                    if (isset($mapping_info['joinColumns'])) {
-                        foreach ($mapping_info['joinColumns'] as $col) {
-                            $join_meta = $meta_result['factory']->getMetadataFor($entity);
-                            $join_ids = $join_meta->getIdentifierFieldNames();
-
-                            $col_name = $col['name'];
-                            $col_name = (isset($meta_result['meta']->fieldNames[$col_name])) ? $meta_result['meta']->fieldNames[$col_name] : $col_name;
-
-                            $meta_result['mappings'][$col_name] = [
-                                'name' => $mapping_name,
-                                'type' => 'one_id',
-                                'entity' => $entity,
-                                'ids' => $join_ids,
-                            ];
-
-                            $meta_result['mappings'][$mapping_name] = [
-                                'name' => $col_name,
-                                'type' => 'one_entity',
-                                'entity' => $entity,
-                                'ids' => $join_ids,
-                            ];
-                        }
-                    }
-                }
-            }
-        }
-
-        return $meta_result;
+        return $normalizer->normalize($entity, [
+            DoctrineEntityNormalizer::DEEP_NORMALIZE            => $deep,
+            DoctrineEntityNormalizer::NORMALIZE_TO_IDENTIFIERS  => $form_mode,
+        ]);
     }
 
     /**
@@ -327,34 +124,5 @@ class Repository extends EntityRepository
     {
         $this->_em->persist($entity);
         $this->_em->flush();
-    }
-
-    protected function _get($entity, $key)
-    {
-        $method_name = $this->_getMethodName($key, '');
-
-        // Default to "getStatus", "getConfig", etc...but also allow "isEnabled" instead of "getIsEnabled"
-        if (method_exists($entity, 'get'.$method_name)) {
-            return $entity->{'get'.$method_name}();
-        }
-        if (method_exists($entity, $method_name)) {
-            return $entity->{$method_name}();
-        }
-        return null;
-    }
-
-    protected function _set($entity, $key, $value)
-    {
-        $method_name = $this->_getMethodName($key, 'set');
-
-        return (method_exists($entity, $method_name))
-            ? $entity->$method_name($value)
-            : null;
-    }
-
-    // Converts "getvar_name_blah" to "getVarNameBlah".
-    protected function _getMethodName($var, $prefix = '')
-    {
-        return $prefix . str_replace(" ", "", ucwords(strtr($var, "_-", "  ")));
     }
 }
