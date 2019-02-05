@@ -315,9 +315,62 @@ class DoctrineEntityNormalizer extends AbstractNormalizer
     {
         $method_name = $this->_getMethodName($key, 'set');
 
-        return (method_exists($entity, $method_name))
-            ? $entity->$method_name($value)
-            : null;
+        if (!method_exists($entity, $method_name)) {
+            return null;
+        }
+
+        $method = new \ReflectionMethod(get_class($entity), $method_name);
+        $first_param = $method->getParameters()[0];
+
+        if ($first_param->hasType()) {
+            $first_param_type = (string)$first_param->getType();
+
+            switch($first_param_type) {
+                case 'DateTime':
+                    if (!($value instanceof \DateTime)) {
+                        if (!is_numeric($value)) {
+                            $value = strtotime($value.' UTC');
+                        }
+
+                        $dt = new \DateTime;
+                        $dt->setTimestamp($value);
+                        $value = $dt;
+                    }
+                    break;
+
+                case 'int':
+                    if ($value === null) {
+                        if (!$first_param->allowsNull()) {
+                            $value = 0;
+                        }
+                    } else {
+                        $value = (int)$value;
+                    }
+                    break;
+
+                case 'float':
+                    if ($value === null) {
+                        if (!$first_param->allowsNull()) {
+                            $value = 0.0;
+                        }
+                    } else {
+                        $value = (float)$value;
+                    }
+                    break;
+
+                case 'bool':
+                    if ($value === null) {
+                        if (!$first_param->allowsNull()) {
+                            $value = false;
+                        }
+                    } else {
+                        $value = (bool)$value;
+                    }
+                    break;
+            }
+        }
+
+        return $entity->$method_name($value);
     }
 
     /**
