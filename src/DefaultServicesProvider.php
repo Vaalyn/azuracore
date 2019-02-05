@@ -446,5 +446,49 @@ class DefaultServicesProvider
             });
         }
 
+        if (!isset($container[\Doctrine\Common\Annotations\Reader::class])) {
+            $container[\Doctrine\Common\Annotations\Reader::class] = function ($di) {
+                /** @var \Azura\Settings $settings */
+                $settings = $di['settings'];
+
+                /** @var DoctrineCache $doctrine_cache */
+                $doctrine_cache = $di[DoctrineCache::class];
+
+                return new \Doctrine\Common\Annotations\CachedReader(
+                    new \Doctrine\Common\Annotations\AnnotationReader,
+                    $doctrine_cache,
+                    !$settings->isProduction()
+                );
+            };
+        }
+
+        if (!isset($container[\Symfony\Component\Serializer\Serializer::class])) {
+            $container[\Symfony\Component\Serializer\Serializer::class] = function ($di) {
+                /** @var \Doctrine\Common\Annotations\Reader $annotation_reader */
+                $annotation_reader = $di[\Doctrine\Common\Annotations\Reader::class];
+
+                $meta_factory = new \Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory(
+                    new \Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader($annotation_reader)
+                );
+
+                $normalizers = [
+                    new \Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer(),
+                    new Normalizer\DoctrineEntityNormalizer($di[EntityManager::class]),
+                    new \Symfony\Component\Serializer\Normalizer\ObjectNormalizer($meta_factory),
+                ];
+                return new \Symfony\Component\Serializer\Serializer($normalizers);
+            };
+        }
+
+        if (!isset($container[\Symfony\Component\Validator\Validator\ValidatorInterface::class])) {
+            $container[\Symfony\Component\Validator\Validator\ValidatorInterface::class] = function($di) {
+                /** @var \Doctrine\Common\Annotations\Reader $annotation_reader */
+                $annotation_reader = $di[\Doctrine\Common\Annotations\Reader::class];
+
+                $builder = new \Symfony\Component\Validator\ValidatorBuilder();
+                $builder->enableAnnotationMapping($annotation_reader);
+                return $builder->getValidator();
+            };
+        }
     }
 }

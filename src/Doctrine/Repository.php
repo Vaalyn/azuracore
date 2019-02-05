@@ -3,6 +3,7 @@ namespace Azura\Doctrine;
 
 use Azura\Normalizer\DoctrineEntityNormalizer;
 use Doctrine\ORM\EntityRepository;
+use Symfony\Component\Serializer\Serializer;
 
 class Repository extends EntityRepository
 {
@@ -90,9 +91,7 @@ class Repository extends EntityRepository
      */
     public function fromArray($entity, array $source)
     {
-        $normalizer = new DoctrineEntityNormalizer($this->_em);
-
-        return $normalizer->denormalize($source, get_class($entity), null, [
+        return $this->_getSerializer()->denormalize($source, get_class($entity), null, [
             DoctrineEntityNormalizer::OBJECT_TO_POPULATE => $entity,
         ]);
     }
@@ -107,11 +106,19 @@ class Repository extends EntityRepository
      */
     public function toArray($entity, $deep = false, $form_mode = false)
     {
-        $normalizer = new DoctrineEntityNormalizer($this->_em);
-
-        return $normalizer->normalize($entity, [
+        return $this->_getSerializer()->normalize($entity, [
             DoctrineEntityNormalizer::DEEP_NORMALIZE            => $deep,
             DoctrineEntityNormalizer::NORMALIZE_TO_IDENTIFIERS  => $form_mode,
+        ]);
+    }
+
+    /**
+     * @return Serializer
+     */
+    protected function _getSerializer(): Serializer
+    {
+        return new Serializer([
+            new DoctrineEntityNormalizer($this->_em),
         ]);
     }
 
