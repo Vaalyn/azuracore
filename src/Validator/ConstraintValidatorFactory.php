@@ -19,14 +19,14 @@ class ConstraintValidatorFactory implements ConstraintValidatorFactoryInterface
     /**
      * @var ContainerInterface
      */
-    protected $di;
+    protected $container;
 
     /**
-     * @param ContainerInterface $di
+     * @param ContainerInterface $container
      */
-    public function __construct(ContainerInterface $di)
+    public function __construct(ContainerInterface $container)
     {
-        $this->di = $di;
+        $this->container = $container;
     }
 
     /**
