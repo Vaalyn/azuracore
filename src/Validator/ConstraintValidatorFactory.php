@@ -9,8 +9,6 @@ use Symfony\Component\Validator\ConstraintValidatorFactoryInterface;
 
 class ConstraintValidatorFactory implements ConstraintValidatorFactoryInterface
 {
-    use CallableResolverAwareTrait;
-
     /**
      * @var array
      */
@@ -39,8 +37,10 @@ class ConstraintValidatorFactory implements ConstraintValidatorFactoryInterface
         if (!isset($this->validators[$className])) {
             if ('validator.expression' === $className) {
                 $this->validators[$className] = new ExpressionValidator;
+            } else if ($this->container->has($className)) {
+                $this->validators[$className] = $this->container->get($className);
             } else {
-                $this->validators[$className] = $this->resolveCallable($className);
+                $this->validators[$className] = new $className();
             }
         }
 
