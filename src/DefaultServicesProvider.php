@@ -480,12 +480,19 @@ class DefaultServicesProvider
             };
         }
 
+        if (!isset($container[\Symfony\Component\Validator\ConstraintValidatorFactoryInterface::class])) {
+            $container[\Symfony\Component\Validator\ConstraintValidatorFactoryInterface::class] = function($di) {
+                return new Validator\ConstraintValidatorFactory($di);
+            };
+        }
+
         if (!isset($container[\Symfony\Component\Validator\Validator\ValidatorInterface::class])) {
             $container[\Symfony\Component\Validator\Validator\ValidatorInterface::class] = function($di) {
                 /** @var \Doctrine\Common\Annotations\Reader $annotation_reader */
                 $annotation_reader = $di[\Doctrine\Common\Annotations\Reader::class];
 
                 $builder = new \Symfony\Component\Validator\ValidatorBuilder();
+                $builder->setConstraintValidatorFactory($di[\Symfony\Component\Validator\ConstraintValidatorFactoryInterface::class]);
                 $builder->enableAnnotationMapping($annotation_reader);
                 return $builder->getValidator();
             };
