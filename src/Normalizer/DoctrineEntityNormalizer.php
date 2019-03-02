@@ -1,6 +1,7 @@
 <?php
 namespace Azura\Normalizer;
 
+use Doctrine\Common\Annotations\Reader;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Proxy\Proxy;
@@ -26,15 +27,19 @@ class DoctrineEntityNormalizer extends AbstractNormalizer
     /** @var SerializerInterface|NormalizerInterface|DenormalizerInterface */
     protected $serializer;
 
+    /** @var Reader */
+    protected $annotation_reader;
+
     /**
      * DoctrineEntityNormalizer constructor.
      * @param EntityManager $em
      */
-    public function __construct(EntityManager $em)
+    public function __construct(EntityManager $em, Reader $annotation_reader)
     {
         parent::__construct();
 
         $this->em = $em;
+        $this->annotation_reader = $annotation_reader;
     }
 
     /**
