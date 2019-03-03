@@ -3,6 +3,7 @@ namespace Azura\Doctrine;
 
 use Azura\Normalizer\DoctrineEntityNormalizer;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Symfony\Component\Serializer\Serializer;
 
 class Repository extends EntityRepository
@@ -107,7 +108,6 @@ class Repository extends EntityRepository
     public function toArray($entity, $deep = false, $form_mode = false)
     {
         return $this->_getSerializer()->normalize($entity, null, [
-            DoctrineEntityNormalizer::DEEP_NORMALIZE            => $deep,
             DoctrineEntityNormalizer::NORMALIZE_TO_IDENTIFIERS  => $form_mode,
         ]);
     }
@@ -117,8 +117,11 @@ class Repository extends EntityRepository
      */
     protected function _getSerializer(): Serializer
     {
+        /** @var AnnotationDriver $metadata_driver */
+        $metadata_driver = $this->_em->getConfiguration()->getMetadataDriverImpl();
+
         return new Serializer([
-            new DoctrineEntityNormalizer($this->_em),
+            new DoctrineEntityNormalizer($this->_em, $metadata_driver->getReader()),
         ]);
     }
 

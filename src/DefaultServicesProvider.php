@@ -248,7 +248,14 @@ class DefaultServicesProvider
                     // Fetch and store entity manager.
                     $config = new \Doctrine\ORM\Configuration;
 
-                    $metadata_driver = $config->newDefaultAnnotationDriver($options['modelPath'], $options['useSimpleAnnotations']);
+                    if ($options['useSimpleAnnotations']) {
+                        $metadata_driver = $config->newDefaultAnnotationDriver((array)$options['modelPath'], $options['useSimpleAnnotations']);
+                    } else {
+                        $metadata_driver = new \Doctrine\ORM\Mapping\Driver\AnnotationDriver(
+                            $di[\Doctrine\Common\Annotations\Reader::class],
+                            (array)$options['modelPath']
+                        );
+                    }
                     $config->setMetadataDriverImpl($metadata_driver);
 
                     $repo_factory = new Doctrine\RepositoryFactory($di);
