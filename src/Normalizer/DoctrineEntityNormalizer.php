@@ -1,6 +1,7 @@
 <?php
 namespace Azura\Normalizer;
 
+use Azura\Normalizer\Annotation\DeepNormalize;
 use Doctrine\Common\Annotations\Reader;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManager;
@@ -15,7 +16,6 @@ class DoctrineEntityNormalizer extends AbstractNormalizer
 {
     use ObjectToPopulateTrait;
 
-    public const DEEP_NORMALIZE = 'deep';
     public const NORMALIZE_TO_IDENTIFIERS = 'form_mode';
 
     public const CLASS_METADATA = 'class_metadata';
@@ -104,56 +104,55 @@ class DoctrineEntityNormalizer extends AbstractNormalizer
      */
     protected function getAttributeValue($object, $prop_name, $format = null, array $context = array())
     {
-        $deep = $context[self::DEEP_NORMALIZE] ?? true;
         $form_mode = $context[self::NORMALIZE_TO_IDENTIFIERS] ?? false;
 
-        $prop_info = $context[self::CLASS_METADATA]->fieldMappings[$prop_name] ?? [];
-
         try {
-            $prop_val = $this->_get($object, $prop_name);
+            if (isset($context[self::CLASS_METADATA]->fieldMappings[$prop_name])) {
+                return $this->_get($object, $prop_name);
+            }
+
+            if (isset($context[self::CLASS_METADATA]->associationMappings[$prop_name])) {
+                $annotation = $this->annotation_reader->getPropertyAnnotation(
+                    new \ReflectionProperty(get_class($object), $prop_name),
+                    DeepNormalize::class
+                );
+
+                $deep = ($annotation instanceof DeepNormalize)
+                    ? $annotation->getDeepNormalize()
+                    : false;
+
+                if ($deep) {
+                    $prop_val = $this->_get($object, $prop_name);
+
+                    if ($prop_val instanceof Collection) {
+                        $return_val = [];
+                        if (count($prop_val) > 0) {
+                            foreach ($prop_val as $val_obj) {
+                                if ($form_mode) {
+                                    $obj_meta = $this->em->getClassMetadata(get_class($val_obj));
+                                    $id_field = $obj_meta->identifier;
+
+                                    if ($id_field && count($id_field) === 1) {
+                                        $return_val[] = $this->_get($val_obj, $id_field[0]);
+                                    }
+                                } else {
+                                    $return_val[] = $this->serializer->normalize($val_obj, $format, $context);
+                                }
+                            }
+                        }
+                        return $return_val;
+                    }
+
+                    return $this->serializer->normalize($prop_val, $format, $context);
+                }
+
+                return null;
+            }
+
+            return $this->_get($object, $prop_name);
         } catch(\Azura\Exception\NoGetterAvailable $e) {
             return null;
         }
-
-        if (is_array($prop_val)) {
-            return $prop_val;
-        }
-
-        if (!is_object($prop_val)) {
-            if ('array' === $prop_info['type']) {
-                return (array)$prop_val;
-            }
-            return (string)$prop_val;
-        }
-
-        if ($prop_val instanceof \DateTime) {
-            return $prop_val->getTimestamp();
-        }
-
-        if ($deep) {
-            if ($prop_val instanceof Collection) {
-                $return_val = [];
-                if (count($prop_val) > 0) {
-                    foreach ($prop_val as $val_obj) {
-                        if ($form_mode) {
-                            $obj_meta = $this->em->getClassMetadata(get_class($val_obj));
-                            $id_field = $obj_meta->identifier;
-
-                            if ($id_field && count($id_field) === 1) {
-                                $return_val[] = $this->_get($val_obj, $id_field[0]);
-                            }
-                        } else {
-                            $return_val[] = $this->serializer->normalize($val_obj, $format, $context);
-                        }
-                    }
-                }
-                return $return_val;
-            }
-
-            return $this->serializer->normalize($prop_val, $format, $context);
-        }
-
-        return null;
     }
 
     /**
