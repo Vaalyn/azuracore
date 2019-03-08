@@ -19,6 +19,11 @@ class Exception extends \Exception
         $this->message = $message;
     }
 
+    public function getFormattedMessage(): string
+    {
+        return $this->message;
+    }
+
     public function setLoggerLevel($logger_level): void
     {
         $this->logger_level = $logger_level;
