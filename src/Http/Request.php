@@ -61,6 +61,21 @@ class Request extends \Slim\Http\Request
     }
 
     /**
+     * Get the current HTTP_REFERER header, or return a default value.
+     *
+     * @param string|null $default
+     * @return string|null
+     */
+    public function getReferrer($default = null): ?string
+    {
+        $referer = $this->getHeaderLine('HTTP_REFERER');
+
+        return (!empty($referer))
+            ? $referer
+            : $default;
+    }
+
+    /**
      * Pull the current route, if it's generated yet.
      *
      * @return Route
