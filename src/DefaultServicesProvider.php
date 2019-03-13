@@ -406,7 +406,7 @@ class DefaultServicesProvider
                 /** @var Settings $settings */
                 $settings = $di['settings'];
 
-                if ($settings->isTesting()) {
+                if (!$settings->isTesting()) {
                     ini_set('session.gc_maxlifetime', 86400);
                     ini_set('session.gc_probability', 1);
                     ini_set('session.gc_divisor', 100);
