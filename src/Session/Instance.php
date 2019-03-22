@@ -10,7 +10,7 @@ class Instance extends Temporary
         // Lazy load session.
         if ($this->_session->exists()) {
             $this->_session->start();
-            $this->_data = $_SESSION[$this->_namespace];
+            $this->_data = $_SESSION[$this->_namespace] ?? [];
         }
     }
 
