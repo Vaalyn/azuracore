@@ -1,6 +1,8 @@
 <?php
 namespace Azura;
 
+use Doctrine\Common\Annotations\AnnotationRegistry;
+
 class App extends \Slim\App
 {
     /**
