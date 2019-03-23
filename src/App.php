@@ -23,6 +23,12 @@ class App extends \Slim\App
      */
     public static function create(array $values): self
     {
+        // Register Annotation autoloader
+        if (isset($values['autoloader'])) {
+            $autoloader = $values['autoloader'];
+            AnnotationRegistry::registerLoader([$autoloader, 'loadClass']);
+        }
+
         $settings = $values['settings'] ?? [];
 
         if (!isset($settings[Settings::BASE_DIR])) {
