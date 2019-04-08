@@ -37,7 +37,7 @@ class DoctrineEntityNormalizer extends AbstractNormalizer
 
     /**
      * @param EntityManager $em
-     * @param Reader|null $annotation_reader
+     * @param Reader|null $annotationReader
      * @param ClassMetadataFactoryInterface|null $classMetadataFactory
      * @param NameConverterInterface|null $nameConverter
      * @param array $defaultContext
@@ -88,7 +88,7 @@ class DoctrineEntityNormalizer extends AbstractNormalizer
 
         $context[self::CLASS_METADATA] = $this->em->getClassMetadata(get_class($object));
 
-        $props = $this->getAllowedAttributes($object, $context, true);
+        $props = $this->getAllowedAttributes($object, $context);
 
         $return_arr = [];
         if ($props) {
