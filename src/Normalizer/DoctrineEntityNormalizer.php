@@ -71,7 +71,7 @@ class DoctrineEntityNormalizer extends AbstractNormalizer
         $context[self::CLASS_METADATA] = $this->em->getClassMetadata(get_class($object));
 
         $reflect = new \ReflectionClass($object);
-        $props = $reflect->getProperties(\ReflectionProperty::IS_PUBLIC | \ReflectionProperty::IS_PROTECTED);
+        $props = $this->getAllowedAttributes($object, $context, true);
 
         $return_arr = [];
         if ($props) {
