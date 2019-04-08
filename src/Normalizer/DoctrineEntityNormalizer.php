@@ -5,7 +5,12 @@ use Azura\Normalizer\Annotation\DeepNormalize;
 use Doctrine\Common\Annotations\Reader;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Proxy\Proxy;
+use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
+use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
+use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -28,18 +33,31 @@ class DoctrineEntityNormalizer extends AbstractNormalizer
     protected $serializer;
 
     /** @var Reader */
-    protected $annotation_reader;
+    protected $annotationReader;
 
     /**
-     * DoctrineEntityNormalizer constructor.
      * @param EntityManager $em
+     * @param Reader|null $annotation_reader
+     * @param ClassMetadataFactoryInterface|null $classMetadataFactory
+     * @param NameConverterInterface|null $nameConverter
+     * @param array $defaultContext
      */
-    public function __construct(EntityManager $em, Reader $annotation_reader)
+    public function __construct(EntityManager $em, Reader $annotationReader = null, ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null, array $defaultContext = [])
     {
-        parent::__construct();
+        /** @var AnnotationDriver $metadata_driver */
+        $metadata_driver = $em->getConfiguration()->getMetadataDriverImpl();
+
+        $annotationReader = $annotationReader ?? $metadata_driver->getReader();
+        $classMetadataFactory = $classMetadataFactory ?? new ClassMetadataFactory(
+            new AnnotationLoader($annotationReader)
+        );
+
+        $defaultContext[self::ALLOW_EXTRA_ATTRIBUTES] = false;
+
+        parent::__construct($classMetadataFactory, $nameConverter, $defaultContext);
 
         $this->em = $em;
-        $this->annotation_reader = $annotation_reader;
+        $this->annotationReader = $annotationReader;
     }
 
     /**
@@ -70,7 +88,6 @@ class DoctrineEntityNormalizer extends AbstractNormalizer
 
         $context[self::CLASS_METADATA] = $this->em->getClassMetadata(get_class($object));
 
-        $reflect = new \ReflectionClass($object);
         $props = $this->getAllowedAttributes($object, $context, true);
 
         $return_arr = [];
@@ -112,7 +129,7 @@ class DoctrineEntityNormalizer extends AbstractNormalizer
             }
 
             if (isset($context[self::CLASS_METADATA]->associationMappings[$prop_name])) {
-                $annotation = $this->annotation_reader->getPropertyAnnotation(
+                $annotation = $this->annotationReader->getPropertyAnnotation(
                     new \ReflectionProperty(get_class($object), $prop_name),
                     DeepNormalize::class
                 );

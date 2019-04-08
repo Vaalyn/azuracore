@@ -480,7 +480,7 @@ class DefaultServicesProvider
 
                 $normalizers = [
                     new \Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer(),
-                    new Normalizer\DoctrineEntityNormalizer($di[EntityManager::class], $annotation_reader),
+                    new Normalizer\DoctrineEntityNormalizer($di[EntityManager::class], $annotation_reader, $meta_factory),
                     new \Symfony\Component\Serializer\Normalizer\ObjectNormalizer($meta_factory),
                 ];
                 return new \Symfony\Component\Serializer\Serializer($normalizers);

@@ -117,11 +117,8 @@ class Repository extends EntityRepository
      */
     protected function _getSerializer(): Serializer
     {
-        /** @var AnnotationDriver $metadata_driver */
-        $metadata_driver = $this->_em->getConfiguration()->getMetadataDriverImpl();
-
         return new Serializer([
-            new DoctrineEntityNormalizer($this->_em, $metadata_driver->getReader()),
+            new DoctrineEntityNormalizer($this->_em),
         ]);
     }
 
