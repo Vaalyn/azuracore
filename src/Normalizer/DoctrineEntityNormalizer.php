@@ -113,6 +113,43 @@ class DoctrineEntityNormalizer extends AbstractNormalizer
     }
 
     /**
+     * @param object|string $classOrObject
+     * @param array $context
+     * @param bool $attributesAsString
+     * @return bool|string[]|\Symfony\Component\Serializer\Mapping\AttributeMetadataInterface[]
+     */
+    protected function getAllowedAttributes($classOrObject, array $context, $attributesAsString = false)
+    {
+        $meta = $this->classMetadataFactory->getMetadataFor($classOrObject)->getAttributesMetadata();
+
+        $reflect = new \ReflectionClass($classOrObject);
+        $props_raw = $reflect->getProperties(\ReflectionProperty::IS_PUBLIC | \ReflectionProperty::IS_PROTECTED);
+        $props = [];
+        foreach($props_raw as $prop_raw) {
+            $props[$prop_raw->getName()] = $prop_raw;
+        }
+
+        $props = array_intersect_key($meta, $props);
+
+        $tmpGroups = $context[self::GROUPS] ?? $this->defaultContext[self::GROUPS] ?? null;
+        $groups = (\is_array($tmpGroups) || is_scalar($tmpGroups)) ? (array) $tmpGroups : false;
+
+        $allowedAttributes = [];
+        foreach ($props as $attributeMetadata) {
+            $name = $attributeMetadata->getName();
+
+            if (
+                (false === $groups || array_intersect($attributeMetadata->getGroups(), $groups)) &&
+                $this->isAllowedAttribute($classOrObject, $name, null, $context)
+            ) {
+                $allowedAttributes[] = $attributesAsString ? $name : $attributeMetadata;
+            }
+        }
+
+        return $allowedAttributes;
+    }
+
+    /**
      * @param object $object
      * @param string $prop_name
      * @param null $format
