@@ -9,22 +9,6 @@ use Symfony\Component\Serializer\Serializer;
 class Repository extends EntityRepository
 {
     /**
-     * Combination of find() and toArray() helper functions.
-     *
-     * @param mixed $id
-     * @param bool $deep
-     * @param bool $form_mode
-     * @return array|null
-     */
-    public function findAsArray($id, $deep = false, $form_mode = false)
-    {
-        $record = $this->_em->find($this->_entityName, $id);
-        return ($record === null)
-            ? null
-            : $this->toArray($record, $deep, $form_mode);
-    }
-
-    /**
      * Generate an array result of all records.
      *
      * @param bool $cached
