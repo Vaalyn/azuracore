@@ -162,10 +162,6 @@ class DoctrineEntityNormalizer extends AbstractNormalizer
     {
         $form_mode = $context[self::NORMALIZE_TO_IDENTIFIERS] ?? false;
 
-        if (isset($context[self::CLASS_METADATA]->fieldMappings[$prop_name])) {
-            return $this->_get($object, $prop_name);
-        }
-
         if (isset($context[self::CLASS_METADATA]->associationMappings[$prop_name])) {
             $annotation = $this->annotationReader->getPropertyAnnotation(
                 new \ReflectionProperty(get_class($object), $prop_name),
@@ -176,32 +172,32 @@ class DoctrineEntityNormalizer extends AbstractNormalizer
                 ? $annotation->getDeepNormalize()
                 : false;
 
-            if ($deep) {
-                $prop_val = $this->_get($object, $prop_name);
-
-                if ($prop_val instanceof Collection) {
-                    $return_val = [];
-                    if (count($prop_val) > 0) {
-                        foreach ($prop_val as $val_obj) {
-                            if ($form_mode) {
-                                $obj_meta = $this->em->getClassMetadata(get_class($val_obj));
-                                $id_field = $obj_meta->identifier;
-
-                                if ($id_field && count($id_field) === 1) {
-                                    $return_val[] = $this->_get($val_obj, $id_field[0]);
-                                }
-                            } else {
-                                $return_val[] = $this->serializer->normalize($val_obj, $format, $context);
-                            }
-                        }
-                    }
-                    return $return_val;
-                }
-
-                return $this->serializer->normalize($prop_val, $format, $context);
+            if (!$deep) {
+                throw new \Azura\Exception\NoGetterAvailable(sprintf('Deep normalization disabled for property %s.', $prop_name));
             }
 
-            return null;
+            $prop_val = $this->_get($object, $prop_name);
+
+            if ($prop_val instanceof Collection) {
+                $return_val = [];
+                if (count($prop_val) > 0) {
+                    foreach ($prop_val as $val_obj) {
+                        if ($form_mode) {
+                            $obj_meta = $this->em->getClassMetadata(get_class($val_obj));
+                            $id_field = $obj_meta->identifier;
+
+                            if ($id_field && count($id_field) === 1) {
+                                $return_val[] = $this->_get($val_obj, $id_field[0]);
+                            }
+                        } else {
+                            $return_val[] = $this->serializer->normalize($val_obj, $format, $context);
+                        }
+                    }
+                }
+                return $return_val;
+            }
+
+            return $this->serializer->normalize($prop_val, $format, $context);
         }
 
         return $this->_get($object, $prop_name);
