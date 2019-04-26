@@ -303,4 +303,21 @@ class File
         $str = str_replace('%', '-', $str);
         return $str;
     }
+
+    /**
+     * @param string $path
+     *
+     * @return string
+     */
+    public static function sanitizePathPrefix(string $path): string {
+        $pattern = '/.*:\/\//i';
+
+        $path = preg_replace($pattern, '', $path);
+
+        if (preg_match($pattern, $path)) {
+            return self::sanitizePathPrefix($path);
+        }
+
+        return $path;
+    }
 }
